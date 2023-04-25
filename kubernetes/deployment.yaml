@@ -1,0 +1,37 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trainings
+  labels:
+    app: fiufit
+    tier: trainings-microservice
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: fiufit
+      tier: trainings-microservice
+  template:
+    metadata:
+      labels:
+        app: fiufit
+        tier: trainings-microservice
+    spec:
+      containers:
+      - name: trainings
+        image: marianocinalli/trainings:v0.0.1
+        imagePullPolicy: Always
+        envFrom:
+        - configMapRef:
+            name: trainings-configuration
+        ports:
+          - containerPort: 80
+            name: http-trainings
+        resources:
+          limits:
+            memory: 512Mi
+            cpu: "1"
+          requests:
+            memory: 128Mi
+            cpu: "0.2"
