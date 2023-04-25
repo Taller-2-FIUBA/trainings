@@ -7,4 +7,7 @@ setup(
     version='1.0',
     description='Service to interact with trainings',
     author='Grupo 5',
+    packages=[''],
+    include_package_data=True,
+    exclude_package_data={'': ['tests', 'kubernetes']},
 )
