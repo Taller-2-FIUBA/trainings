@@ -43,7 +43,6 @@ docker run --rm -p 8080:80 --name CONTAINER_NAME IMAGE_NAME
 ```
 
 Where `IMAGE_NAME` is the name chosen in the previous step and `CONTAINER_NAME`
-is a name to identify the container running.  
+is a name to identify the container running.
 Notice `--rm` tells docker to remove the container after exists, and
 `-p 8080:80` maps the port 80 in the container to the port 8080 in the host.
-
