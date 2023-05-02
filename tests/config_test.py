@@ -63,3 +63,9 @@ def test_when_environment_db_port_expect_5432():
 def test_when_environment_db_database_expect_fiufit():
     cnf = to_config(AppConfig)
     assert cnf.db.database == "fiufit"
+
+
+@patch.dict(environ, {"TRAININGS_DB_CREATE_STRUCTURES": "True"}, clear=True)
+def test_when_environment_db_create_structures_expect_true():
+    cnf = to_config(AppConfig)
+    assert cnf.db.create_structures

@@ -19,5 +19,6 @@ class AppConfig:
         host = var("localhost")
         port = var(5432, converter=int)
         database = var("postgres")
+        create_structures = var(False, converter=bool)
 
     db = group(DB)  # type: ignore
