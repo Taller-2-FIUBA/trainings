@@ -4,6 +4,7 @@ EXPECTED_TRAININGS = {
     "items": [
         {
             "id": 1,
+            "trainer_id": "Ju6JXm1S8rVQfyC18mqL418JdgE2",
             "tittle": "The first training.",
             "description": "This is the first training.",
             "type": "Cardio",

@@ -71,6 +71,7 @@ class Training(Base):
 
     __tablename__ = "training"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    trainer_id = Column(String)
     tittle = Column(String)
     description = Column(String)
     type_id: Mapped[int] = mapped_column(ForeignKey("training_type.id"))

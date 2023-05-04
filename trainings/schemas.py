@@ -17,6 +17,7 @@ class Exercise(BaseModel):
 class TrainingIn(BaseModel):
     """Training DTO."""
 
+    trainer_id: str
     tittle: str
     description: str
     type: str

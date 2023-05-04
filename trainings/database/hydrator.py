@@ -9,6 +9,7 @@ def hydrate(training: Training) -> TrainingOut:
     logging.debug("Creating DTO for %s", training)
     dto = TrainingOut(
         id=int(training.id),
+        trainer_id=str(training.trainer_id),
         tittle=str(training.tittle),
         description=str(training.description),
         difficulty=str(training.difficulty.name),
