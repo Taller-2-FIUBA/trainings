@@ -43,13 +43,12 @@ async def get_trainings(
     session: Session = Depends(get_db)
 ) -> TrainingsWithPagination:
     """Get all sessions."""
-    logging.info("Received request to %s", BASE_URI)
     m.REQUEST_COUNTER.labels(BASE_URI, "get").inc()
-    logging.debug("Running query...")
+    logging.info("Running query...")
     with session as open_session:
         trainings = browse(open_session, offset, limit)
     dtos = []
-    logging.debug("Building DTOs...")
+    logging.info("Building DTOs...")
     for training in trainings:
         dtos.append(hydrate(training))
     response = TrainingsWithPagination(
