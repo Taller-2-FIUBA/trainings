@@ -77,7 +77,6 @@ class Training(Base):
     type_id: Mapped[int] = mapped_column(ForeignKey("training_type.id"))
     difficulty_id: Mapped[int] = mapped_column(ForeignKey("difficulty.id"))
     media = Column(String)
-    rating: Mapped[int] = mapped_column(default=0)
 
     # Relationships
     type: Mapped["TrainingType"] = relationship(lazy="joined")

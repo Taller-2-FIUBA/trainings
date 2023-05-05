@@ -15,7 +15,7 @@ def hydrate(training: Training) -> TrainingOut:
         difficulty=str(training.difficulty.name),
         type=str(training.type.name),
         media=str(training.media),
-        rating=int(training.rating),
+        rating=0,
         exercises=[],
     )
     logging.info("Creating DTO for training exercises...")
