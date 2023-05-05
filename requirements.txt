@@ -1,3 +1,7 @@
 fastapi[all]
+pydantic
 prometheus-client
 environ-config
+uvicorn
+sqlalchemy
+psycopg2-binary
