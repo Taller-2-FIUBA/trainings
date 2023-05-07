@@ -19,7 +19,7 @@ from trainings.schemas import (
     TrainingFilters,
 )
 from trainings.dao import browse, add, read
-from trainings.hydrator import hydrate as hydrate_dto
+from trainings.trainings.hydrator import hydrate as hydrate_dto
 from trainings.types.dto import TrainingTypesOut
 from trainings.types.dao import browse as browse_types
 from trainings.types.hydrator import hydrate as hydrate_training_types
