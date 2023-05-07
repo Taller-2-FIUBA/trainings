@@ -82,3 +82,14 @@ TRAINING_TO_BE_CREATED = {
         }
     ]
 }
+
+EXPECTED_TRAINING_TYPES = {
+    "items": [
+        "Cardio",
+        "Leg",
+        "Arm",
+        "Chest",
+        "Back",
+        "Abdomen",
+    ]
+}
