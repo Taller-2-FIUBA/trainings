@@ -13,7 +13,7 @@ from trainings.database.url import get_database_url
 from trainings.database.models import Base
 from trainings.database.hydrator import hydrate as hydrate_model
 from trainings.schemas import TrainingIn, TrainingOut, TrainingsWithPagination
-from trainings.dao import browse, add
+from trainings.dao import browse, add, read
 from trainings.hydrator import hydrate as hydrate_dto
 
 BASE_URI = "/trainings"
@@ -62,6 +62,24 @@ async def get_trainings(
         limit=limit
     )
     return response
+
+
+@app.get(
+    BASE_URI + "/{training_id}",
+    response_model=TrainingOut,
+    response_model_exclude_none=True,
+)
+async def get_training(
+    training_id: int,
+    session: Session = Depends(get_db)
+) -> TrainingsWithPagination:
+    """Get one training."""
+    m.REQUEST_COUNTER.labels(BASE_URI, "get").inc()
+    logging.info(f"Searching for training {training_id}...")
+    with session as open_session:
+        training = read(open_session, training_id)
+    logging.info("Building DTO...")
+    return hydrate_dto(training)
 
 
 @app.post(
