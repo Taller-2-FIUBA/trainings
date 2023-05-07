@@ -12,7 +12,12 @@ from trainings.config import AppConfig
 from trainings.database.url import get_database_url
 from trainings.database.models import Base
 from trainings.database.hydrator import hydrate as hydrate_model
-from trainings.schemas import TrainingIn, TrainingOut, TrainingsWithPagination
+from trainings.schemas import (
+    TrainingIn,
+    TrainingOut,
+    TrainingsWithPagination,
+    TrainingFilters,
+)
 from trainings.dao import browse, add, read
 from trainings.hydrator import hydrate as hydrate_dto
 
@@ -37,29 +42,40 @@ def get_db() -> Session:
     return Session(autocommit=False, autoflush=False, bind=ENGINE)
 
 
+# pylint: disable=too-many-arguments
 @app.get(
     BASE_URI,
     response_model=TrainingsWithPagination,
     response_model_exclude_none=True,
 )
 async def get_trainings(
+    trainer_id: str | None = None,
+    training_type: str | None = None,
+    difficulty: str | None = None,
     offset: int = 0,
     limit: int = 10,
     session: Session = Depends(get_db)
 ) -> TrainingsWithPagination:
-    """Get all sessions."""
+    """Get trainings matching a filtering criteria."""
     m.REQUEST_COUNTER.labels(BASE_URI, "get").inc()
-    logging.info("Running query...")
+    filters = TrainingFilters(
+        trainer_id=trainer_id,
+        type=training_type,
+        difficulty=difficulty,
+        offset=offset,
+        limit=limit,
+    )
+    logging.info("Searching for trainings matching (%s)...", filters.dict())
     with session as open_session:
-        trainings = browse(open_session, offset, limit)
+        trainings = browse(open_session, filters)
     dtos = []
     logging.info("Building DTOs...")
     for training in trainings:
         dtos.append(hydrate_dto(training))
     response = TrainingsWithPagination(
         items=dtos,
-        offset=offset,
-        limit=limit
+        offset=filters.offset,
+        limit=filters.limit,
     )
     return response
 
@@ -75,7 +91,7 @@ async def get_training(
 ) -> TrainingsWithPagination:
     """Get one training."""
     m.REQUEST_COUNTER.labels(BASE_URI, "get").inc()
-    logging.info(f"Searching for training {training_id}...")
+    logging.info("Searching for training %d...", training_id)
     with session as open_session:
         training = read(open_session, training_id)
     logging.info("Building DTO...")
