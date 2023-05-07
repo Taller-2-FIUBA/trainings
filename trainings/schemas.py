@@ -39,3 +39,14 @@ class TrainingsWithPagination(BaseModel):
     items: List[TrainingOut]
     offset: Optional[int]
     limit: Optional[int]
+    count: Optional[int]
+
+
+class TrainingFilters(BaseModel):
+    """Search trainings filtering by fields."""
+
+    offset: int
+    limit: int
+    trainer_id: Optional[str]
+    type: Optional[str]
+    difficulty: Optional[str]

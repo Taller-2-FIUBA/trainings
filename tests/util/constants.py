@@ -1,42 +1,62 @@
 """Constants used in tests."""
 
-EXPECTED_TRAININGS = {
-    "items": [
+FIRST_TRAINING = {
+    "id": 1,
+    "trainer_id": "Ju6JXm1S8rVQfyC18mqL418JdgE2",
+    "tittle": "The first training.",
+    "description": "This is the first training.",
+    "type": "Cardio",
+    "difficulty": "Easy",
+    "media": "a_firebase_id",
+    "rating": 0,
+    "exercises": [
         {
-            "id": 1,
-            "trainer_id": "Ju6JXm1S8rVQfyC18mqL418JdgE2",
-            "tittle": "The first training.",
-            "description": "This is the first training.",
+            "name": "Walk",
+            "unit": "metre",
             "type": "Cardio",
-            "difficulty": "Easy",
-            "media": "a_firebase_id",
-            "rating": 0,
-            "exercises": [
-                {
-                    "name": "Walk",
-                    "unit": "metre",
-                    "type": "Cardio",
-                    "count": 30,
-                    "series": 1
-                },
-                {
-                    "name": "Run",
-                    "unit": "metre",
-                    "type": "Cardio",
-                    "count": 30,
-                    "series": 1
-                },
-                {
-                    "name": "Jumping jacks",
-                    "type": "Cardio",
-                    "count": 15,
-                    "series": 3
-                },
-            ]
+            "count": 30,
+            "series": 1,
         },
-    ],
+        {
+            "name": "Run",
+            "unit": "metre",
+            "type": "Cardio",
+            "count": 30,
+            "series": 1,
+        },
+        {
+            "name": "Jumping jacks",
+            "type": "Cardio",
+            "count": 15,
+            "series": 3,
+        },
+    ]
+}
+
+TOMATO_TRAINING = {
+    "id": 2,
+    "trainer_id": "tomato",
+    "tittle": "The tomato training.",
+    "description": "This is the tomato training.",
+    "type": "Leg",
+    "difficulty": "Medium",
+    "media": "a_firebase_id",
+    "rating": 0,
+    "exercises": [
+        {
+            "name": "Squat",
+            "type": "Leg",
+            "count": 15,
+            "series": 3,
+        },
+    ]
+}
+
+
+EMPTY_RESPONSE_WITH_PAGINATION = {
+    "items": [],
     "offset": 0,
-    "limit": 10
+    "limit": 10,
 }
 
 
