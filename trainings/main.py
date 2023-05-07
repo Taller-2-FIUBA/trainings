@@ -23,9 +23,13 @@ from trainings.hydrator import hydrate as hydrate_dto
 from trainings.types.dto import TrainingTypesOut
 from trainings.types.dao import browse as browse_types
 from trainings.types.hydrator import hydrate as hydrate_training_types
+from trainings.exercises.dto import ExercisesOut
+from trainings.exercises.dao import browse as browse_exercises
+from trainings.exercises.hydrator import hydrate as hydrate_exercises
 
 BASE_URI = "/trainings"
 TYPES_URI = BASE_URI + "/types/"
+EXERCISES_URI = BASE_URI + "/exercises/"
 CONFIGURATION = to_config(AppConfig)
 app = FastAPI(
     docs_url=BASE_URI + "/documentation",
@@ -131,3 +135,19 @@ async def get_types(session: Session = Depends(get_db)) -> TrainingTypesOut:
         training_types = browse_types(open_session)
     logging.info("Building DTOs...")
     return hydrate_training_types(training_types)
+
+
+@app.get(
+    EXERCISES_URI,
+    response_model=ExercisesOut,
+    response_model_exclude_none=True,
+)
+async def get_exercises(session: Session = Depends(get_db)) -> ExercisesOut:
+    """Get training exercises."""
+    m.REQUEST_COUNTER.labels(EXERCISES_URI, "get").inc()
+    logging.info("Searching for exercises...")
+    exercises = []
+    with session as open_session:
+        exercises = browse_exercises(open_session)
+    logging.info("Building DTOs...")
+    return hydrate_exercises(exercises)

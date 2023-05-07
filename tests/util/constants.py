@@ -93,3 +93,33 @@ EXPECTED_TRAINING_TYPES = {
         "Abdomen",
     ]
 }
+
+EXPECTED_EXERCISES = {
+    "items": [
+        {"name": "Walk", "type": "Cardio", "unit": "metre"},
+        {"name": "Walk", "type": "Cardio", "unit": "second"},
+        {"name": "Run", "type": "Cardio", "unit": "metre"},
+        {"name": "Run", "type": "Cardio", "unit": "second"},
+        {"name": "Jumping jacks", "type": "Cardio"},
+        {"name": "Squat", "type": "Leg"},
+        {"name": "Lunge", "type": "Leg"},
+        {"name": "Deadlift", "type": "Leg"},
+        {"name": "Bicep curl", "type": "Arm"},
+        {"name": "Hammer curl", "type": "Arm"},
+        {"name": "Tricep dips", "type": "Arm"},
+        {"name": "Close grip push up", "type": "Arm"},
+        {"name": "Push-down", "type": "Arm"},
+        {"name": "Lateral raise", "type": "Arm"},
+        {"name": "Front raise", "type": "Arm"},
+        {"name": "Arnold press", "type": "Arm"},
+        {"name": "Push up", "type": "Chest"},
+        {"name": "Bench press", "type": "Chest"},
+        {"name": "Fly", "type": "Chest"},
+        {"name": "Pull-down", "type": "Back"},
+        {"name": "Pull-up", "type": "Back"},
+        {"name": "Bent-over row", "type": "Back"},
+        {"name": "Crunch", "type": "Abdomen"},
+        {"name": "Bicycle crunch", "type": "Abdomen"},
+        {"name": "Plank", "type": "Abdomen"},
+    ]
+}
