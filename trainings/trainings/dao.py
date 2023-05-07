@@ -3,7 +3,7 @@ import logging
 
 from sqlalchemy.orm import Session
 from trainings.database.models import Difficulty, Training, TrainingType
-from trainings.schemas import TrainingFilters
+from trainings.trainings.dto import TrainingFilters
 
 
 def browse(session: Session, filters: TrainingFilters):

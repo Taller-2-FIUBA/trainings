@@ -1,7 +1,7 @@
 """Hydrate DTOs from database objects."""
 import logging
 from trainings.database.models import Training
-from trainings.schemas import (Exercise, TrainingOut)
+from trainings.trainings.dto import (Exercise, TrainingOut)
 
 
 def hydrate(training: Training) -> TrainingOut:

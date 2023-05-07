@@ -12,7 +12,7 @@ from trainings.config import AppConfig
 from trainings.database.url import get_database_url
 from trainings.database.models import Base
 from trainings.database.hydrator import hydrate as hydrate_model
-from trainings.schemas import (
+from trainings.trainings.dto import (
     TrainingIn,
     TrainingOut,
     TrainingsWithPagination,
