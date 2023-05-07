@@ -18,7 +18,7 @@ from trainings.schemas import (
     TrainingsWithPagination,
     TrainingFilters,
 )
-from trainings.dao import browse, add, read
+from trainings.trainings.dao import browse, add, read
 from trainings.trainings.hydrator import hydrate as hydrate_dto
 from trainings.types.dto import TrainingTypesOut
 from trainings.types.dao import browse as browse_types
