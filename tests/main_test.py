@@ -50,3 +50,13 @@ def test_get_all_trainings_with_pagination():
     assert response.status_code == 200
     assert response.json()["offset"] == 10
     assert response.json()["limit"] == 30
+
+
+def test_post_training():
+    response = client.post(BASE_URI, json=c.TRAINING_TO_BE_CREATED)
+    assert response.status_code == 200
+    assert are_equal(
+        response.json(),
+        c.TRAINING_TO_BE_CREATED | {"rating": 0},
+        {"id"}
+    )

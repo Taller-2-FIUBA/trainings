@@ -1,33 +1,45 @@
-"""Hydrate DTOs from database objects."""
+"""Hydrate database model objects from DTOs."""
 import logging
-from trainings.database.models import Training
-from trainings.schemas import (Exercise, TrainingOut)
+from sqlalchemy.orm import Session
+
+from trainings.database.models import (
+    Difficulty,
+    Exercise,
+    Training,
+    TrainingExercise,
+    TrainingType,
+)
+from trainings.schemas import TrainingIn
 
 
-def hydrate(training: Training) -> TrainingOut:
-    """Create an HTTP DTO from a model object."""
-    logging.debug("Creating DTO for %s", training)
-    dto = TrainingOut(
-        id=int(training.id),
-        trainer_id=str(training.trainer_id),
-        tittle=str(training.tittle),
-        description=str(training.description),
-        difficulty=str(training.difficulty.name),
-        type=str(training.type.name),
-        media=str(training.media),
-        rating=0,
-        exercises=[],
-    )
-    logging.info("Creating DTO for training exercises...")
-    for exercise in training.exercises:
-        logging.debug("Creating DTO for %s", exercise)
-        dto.exercises.append(
-            Exercise(
-                name=str(exercise.exercise.name),
-                type=str(exercise.exercise.type.name),
-                unit=str(exercise.exercise.unit),
-                count=exercise.count,
-                series=exercise.series,
+def hydrate(session: Session, training: TrainingIn) -> Training:
+    """Create a database model object from a HTTP API DTO."""
+    exercises = []
+    logging.info("Building exercises for training...")
+    for training_exercise in training.exercises:
+        logging.debug(
+            "Building exercise", **training_exercise.dict()
+        )
+        exercises.append(
+            TrainingExercise(
+                exercise=session.query(Exercise).filter(
+                    Exercise.name == training_exercise.name,
+                    Exercise.unit == training_exercise.unit
+                ).one(),
+                count=training_exercise.count,
+                series=training_exercise.series
             )
         )
-    return dto
+    logging.info("Building training...")
+    foreign_keys = {
+        "exercises": exercises,
+        "type": session.query(TrainingType).filter(
+            TrainingType.name == training.type
+        ).one(),
+        "difficulty": session.query(Difficulty).filter(
+            Difficulty.name == training.difficulty
+        ).one(),
+    }
+    fields = training.dict() | foreign_keys
+    logging.debug("Exercise built", **fields)
+    return Training(**fields)
