@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 import tests.util.constants as c
 from tests.util.assert_helpers import are_equal
 
-from trainings.main import TYPES_URI, app, get_db, BASE_URI
+from trainings.main import EXERCISES_URI, TYPES_URI, app, get_db, BASE_URI
 from trainings.database.models import Base
 from trainings.database.data import init_db
 
@@ -131,3 +131,9 @@ def test_when_getting_training_types_expect_list():
     response = client.get(TYPES_URI)
     assert response.status_code == 200, response.json()
     assert are_equal(response.json(), c.EXPECTED_TRAINING_TYPES, {})
+
+
+def test_when_getting_exercises_expect_list():
+    response = client.get(EXERCISES_URI)
+    assert response.status_code == 200, response.json()
+    assert are_equal(response.json(), c.EXPECTED_EXERCISES, {})
