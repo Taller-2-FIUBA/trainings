@@ -60,3 +60,9 @@ def test_post_training():
         c.TRAINING_TO_BE_CREATED | {"rating": 0},
         {"id"}
     )
+
+
+def test_get_training_by_id():
+    response = client.get(BASE_URI + "/1")
+    assert response.status_code == 200
+    assert are_equal(response.json(), c.EXPECTED_TRAININGS["items"][0], {})

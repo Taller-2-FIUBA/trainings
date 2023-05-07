@@ -10,6 +10,13 @@ def browse(session: Session, offset: int, limit: int):
     return session.query(Training).offset(offset).limit(limit).all()
 
 
+def read(session: Session, training_id: int) -> Training:
+    """Return one training filtering by fields."""
+    return session.query(Training).filter(
+        Training.id == training_id,
+    ).one()
+
+
 def add(session: Session, training: Training) -> Training:
     """Create a training."""
     logging.info("Saving training...")
