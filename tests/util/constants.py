@@ -28,7 +28,6 @@ EXPECTED_TRAININGS = {
                 },
                 {
                     "name": "Jumping jacks",
-                    "unit": "None",
                     "type": "Cardio",
                     "count": 15,
                     "series": 3
@@ -38,4 +37,28 @@ EXPECTED_TRAININGS = {
     ],
     "offset": 0,
     "limit": 10
+}
+
+
+TRAINING_TO_BE_CREATED = {
+    "trainer_id": "Ju6JXm1S8rVQf7C18mqL418JdgE2",
+    "tittle": "A training created with POST.",
+    "description": "A training created with POST.",
+    "type": "Arm",
+    "difficulty": "Medium",
+    "media": "a_firebase_id",
+    "exercises": [
+        {
+            "name": "Hammer curl",
+            "type": "Arm",
+            "count": 15,
+            "series": 3
+        },
+        {
+            "name": "Arnold press",
+            "type": "Arm",
+            "count": 10,
+            "series": 4
+        }
+    ]
 }
