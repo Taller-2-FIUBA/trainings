@@ -9,7 +9,7 @@ from trainings.database.models import (
     TrainingExercise,
     TrainingType,
 )
-from trainings.schemas import TrainingIn
+from trainings.trainings.dto import TrainingIn
 
 
 def hydrate(session: Session, training: TrainingIn) -> Training:
