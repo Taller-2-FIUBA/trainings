@@ -75,7 +75,7 @@ async def get_training(
 ) -> TrainingsWithPagination:
     """Get one training."""
     m.REQUEST_COUNTER.labels(BASE_URI, "get").inc()
-    logging.info(f"Searching for training {training_id}...")
+    logging.info("Searching for training %d...", training_id)
     with session as open_session:
         training = read(open_session, training_id)
     logging.info("Building DTO...")
