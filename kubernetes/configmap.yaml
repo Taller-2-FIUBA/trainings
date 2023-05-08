@@ -11,4 +11,5 @@ data:
   TRAININGS_DB_USER: "backend"
   TRAININGS_DB_PASSWORD: $USERS_DB_PASSWORD
   TRAININGS_DB_HOST: "dpg-cgno8m8rddl9mmvdaja0-a.oregon-postgres.render.com"
+  TRAININGS_DB_CREATE_STRUCTURES: "true"
   TRAININGS_AUTH_HOST: auth-service.$NAMESPACE.svc.cluster.local:8002
