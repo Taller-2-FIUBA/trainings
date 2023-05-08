@@ -11,6 +11,7 @@ from trainings.trainings.dto import TrainingFilters
 
 
 def get_criteria(session: Session, filters: TrainingFilters) -> List:
+    """Get filtering criteria to search trainings."""
     criteria = []
     logging.info("Building search criteria...")
     if filters.trainer_id:

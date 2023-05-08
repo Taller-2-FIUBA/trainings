@@ -84,7 +84,6 @@ def test_when_filtering_by_type_cardio_returns_first_training():
 def test_when_filtering_training_by_type_finger_expect_error():
     response = client.get(BASE_URI, params={"training_type": "finger"})
     assert response.status_code == 400
-    print(response.json())
     assert response.json() == {
         "detail": "Could not save training. Type finger not found."
     }
@@ -99,10 +98,10 @@ def test_when_filtering_by_difficulty_easy_returns_tomato_training():
         {},
     )
 
+
 def test_when_filtering_training_by_difficulty_beginner_expect_error():
     response = client.get(BASE_URI, params={"difficulty": "beginner"})
     assert response.status_code == 400
-    print(response.json())
     assert response.json() == {
         "detail": "Could not save training. Difficulty beginner not found."
     }
@@ -153,6 +152,106 @@ def test_post_training(assert_can_create_training_mock):
     FIREBASE_SAVE_MOCK.assert_called_once_with("blobOfMedia")
 
 
+def test_when_creating_training_without_tittle_expect_error():
+    response = client.post(
+        BASE_URI, json=c.TRAINING_TO_BE_CREATED | {"tittle": None}
+    )
+    assert response.status_code == 422
+    expected_error = {
+        "detail": [
+            {
+                "loc": [
+                    "body",
+                    "tittle"
+                ],
+                "msg": "none is not an allowed value",
+                "type": "type_error.none.not_allowed"
+            }
+        ]
+    }
+    assert response.json() == expected_error
+
+
+def test_when_creating_training_without_description_expect_error():
+    response = client.post(
+        BASE_URI, json=c.TRAINING_TO_BE_CREATED | {"description": None}
+    )
+    assert response.status_code == 422
+    expected_error = {
+        "detail": [
+            {
+                "loc": [
+                    "body",
+                    "description"
+                ],
+                "msg": "none is not an allowed value",
+                "type": "type_error.none.not_allowed"
+            }
+        ]
+    }
+    assert response.json() == expected_error
+
+
+def test_when_creating_training_without_trainer_id_expect_error():
+    response = client.post(
+        BASE_URI, json=c.TRAINING_TO_BE_CREATED | {"trainer_id": None}
+    )
+    assert response.status_code == 422
+    expected_error = {
+        "detail": [
+            {
+                "loc": [
+                    "body",
+                    "trainer_id"
+                ],
+                "msg": "none is not an allowed value",
+                "type": "type_error.none.not_allowed"
+            }
+        ]
+    }
+    assert response.json() == expected_error
+
+
+def test_when_creating_training_without_difficulty_expect_error():
+    response = client.post(
+        BASE_URI, json=c.TRAINING_TO_BE_CREATED | {"difficulty": None}
+    )
+    assert response.status_code == 422
+    expected_error = {
+        "detail": [
+            {
+                "loc": [
+                    "body",
+                    "difficulty"
+                ],
+                "msg": "none is not an allowed value",
+                "type": "type_error.none.not_allowed"
+            }
+        ]
+    }
+    assert response.json() == expected_error
+
+
+def test_when_creating_training_without_type_expect_error():
+    response = client.post(
+        BASE_URI, json=c.TRAINING_TO_BE_CREATED | {"type": None}
+    )
+    assert response.status_code == 422
+    expected_error = {
+        "detail": [
+            {
+                "loc": [
+                    "body",
+                    "type"
+                ],
+                "msg": "none is not an allowed value",
+                "type": "type_error.none.not_allowed"
+            }
+        ]
+    }
+    assert response.json() == expected_error
+
+
 def test_get_training_by_id():
     response = client.get(BASE_URI + "/1")
     assert response.status_code == 201
@@ -162,7 +261,6 @@ def test_get_training_by_id():
 def test_when_getting_training_of_id_999_expect_error():
     response = client.get(BASE_URI + "/999")
     assert response.status_code == 404
-    print(response.json())
     assert response.json() == {"detail": "Training not found."}
 
 
