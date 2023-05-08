@@ -11,7 +11,7 @@ spec:
   ports:
   - name: trainings-svc
     protocol: TCP
-    port: 8001
+    port: 8003
     targetPort: http-trainings
   selector:
     app: fiufit

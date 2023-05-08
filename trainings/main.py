@@ -1,11 +1,12 @@
 """Requests handlers."""
 import logging
 
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI, HTTPException, Request
 from environ import to_config
 from prometheus_client import start_http_server
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.exc import NoResultFound
 from httpx import Client
 from trainings.firebase import save
 
@@ -95,6 +96,7 @@ async def get_trainings(
     BASE_URI + "/{training_id}",
     response_model=TrainingOut,
     response_model_exclude_none=True,
+    status_code=201,
 )
 async def get_training(
     training_id: int,
@@ -103,8 +105,13 @@ async def get_training(
     """Get one training."""
     m.REQUEST_COUNTER.labels(BASE_URI, "get").inc()
     logging.info("Searching for training %d...", training_id)
-    with session as open_session:
-        training = read(open_session, training_id)
+    try:
+        with session as open_session:
+            training = read(open_session, training_id)
+    except NoResultFound as error:
+        raise HTTPException(
+            detail="Training not found.", status_code=404
+        ) from error
     logging.info("Building DTO...")
     return hydrate_dto(training)
 

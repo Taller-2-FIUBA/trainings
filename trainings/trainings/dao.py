@@ -2,29 +2,15 @@
 import logging
 
 from sqlalchemy.orm import Session
-from trainings.database.models import Difficulty, Training, TrainingType
+from trainings.database.models import Training
 from trainings.trainings.dto import TrainingFilters
+from trainings.trainings.filters import get_criteria
 
 
 def browse(session: Session, filters: TrainingFilters):
     """Return all trainings matching filters."""
-    criteria = []
-    if filters.trainer_id:
-        criteria.append(Training.trainer_id == filters.trainer_id)
-    if filters.type:
-        criteria.append(
-            Training.type == session.query(TrainingType).filter(
-                TrainingType.name == filters.type,
-            ).one()
-        )
-    if filters.difficulty:
-        criteria.append(
-            Training.difficulty == session.query(Difficulty).filter(
-                Difficulty.name == filters.difficulty,
-            ).one()
-        )
     logging.info("Running query...")
-    return session.query(Training).filter(*criteria)\
+    return session.query(Training).filter(*get_criteria(session, filters))\
         .offset(filters.offset).limit(filters.limit).all()
 
 
