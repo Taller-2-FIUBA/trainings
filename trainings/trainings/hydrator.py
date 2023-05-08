@@ -15,6 +15,7 @@ def hydrate(training: Training) -> TrainingOut:
         difficulty=str(training.difficulty.name),
         type=str(training.type.name),
         media=str(training.media),
+        blocked=bool(training.blocked),
         rating=0,
         exercises=[],
     )

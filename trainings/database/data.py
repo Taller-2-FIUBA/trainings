@@ -80,6 +80,7 @@ def insert_trainings(session: Session) -> None:
             type_id=1,
             difficulty_id=1,
             media="a_firebase_id",
+            blocked=False,
         ),
         Training(
             id=2,
@@ -89,6 +90,7 @@ def insert_trainings(session: Session) -> None:
             type_id=2,
             difficulty_id=2,
             media="a_firebase_id",
+            blocked=False,
         ),
     ]
     _insert(session, trainings)

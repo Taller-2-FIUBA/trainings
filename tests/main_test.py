@@ -121,9 +121,14 @@ def test_when_filtering_by_trainer_id_banana_returns_no_training():
 def test_post_training(assert_can_create_training_mock):
     response = client.post(BASE_URI, json=c.TRAINING_TO_BE_CREATED)
     assert response.status_code == 200
+    values_to_override = {
+        "rating": 0,
+        "media": "a_firebase_id",
+        "blocked": False,
+    }
     assert are_equal(
         response.json(),
-        c.TRAINING_TO_BE_CREATED | {"rating": 0, "media": "a_firebase_id"},
+        c.TRAINING_TO_BE_CREATED | values_to_override,
         {"id"}
     )
     GET_PERMISSIONS_MOCK.assert_called_once()
