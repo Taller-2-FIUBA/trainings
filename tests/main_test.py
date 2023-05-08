@@ -81,6 +81,15 @@ def test_when_filtering_by_type_cardio_returns_first_training():
     )
 
 
+def test_when_filtering_training_by_type_finger_expect_error():
+    response = client.get(BASE_URI, params={"training_type": "finger"})
+    assert response.status_code == 400
+    print(response.json())
+    assert response.json() == {
+        "detail": "Could not save training. Type finger not found."
+    }
+
+
 def test_when_filtering_by_difficulty_easy_returns_tomato_training():
     response = client.get(BASE_URI, params={"difficulty": "Medium"})
     assert response.status_code == 200
@@ -89,6 +98,14 @@ def test_when_filtering_by_difficulty_easy_returns_tomato_training():
         c.EMPTY_RESPONSE_WITH_PAGINATION | {"items": [c.TOMATO_TRAINING]},
         {},
     )
+
+def test_when_filtering_training_by_difficulty_beginner_expect_error():
+    response = client.get(BASE_URI, params={"difficulty": "beginner"})
+    assert response.status_code == 400
+    print(response.json())
+    assert response.json() == {
+        "detail": "Could not save training. Difficulty beginner not found."
+    }
 
 
 def test_when_filtering_by_all_available_fields_expect_first_training():
@@ -145,7 +162,8 @@ def test_get_training_by_id():
 def test_when_getting_training_of_id_999_expect_error():
     response = client.get(BASE_URI + "/999")
     assert response.status_code == 404
-    assert response.json() == {'detail': 'Training not found.'}
+    print(response.json())
+    assert response.json() == {"detail": "Training not found."}
 
 
 def test_when_getting_training_types_expect_list():

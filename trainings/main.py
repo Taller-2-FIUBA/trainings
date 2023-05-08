@@ -6,6 +6,7 @@ from environ import to_config
 from prometheus_client import start_http_server
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.exc import NoResultFound
 from httpx import Client
 from trainings.firebase import save
 
@@ -107,10 +108,10 @@ async def get_training(
     try:
         with session as open_session:
             training = read(open_session, training_id)
-    except Exception as login_exception:
+    except NoResultFound as error:
         raise HTTPException(
             detail="Training not found.", status_code=404
-        ) from login_exception
+        ) from error
     logging.info("Building DTO...")
     return hydrate_dto(training)
 
