@@ -9,6 +9,7 @@ FIRST_TRAINING = {
     "difficulty": "Easy",
     "media": "a_firebase_id",
     "rating": 0,
+    "blocked": False,
     "exercises": [
         {
             "name": "Walk",
@@ -42,6 +43,7 @@ TOMATO_TRAINING = {
     "difficulty": "Medium",
     "media": "a_firebase_id",
     "rating": 0,
+    "blocked": False,
     "exercises": [
         {
             "name": "Squat",

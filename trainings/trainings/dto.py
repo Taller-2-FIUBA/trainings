@@ -31,6 +31,7 @@ class TrainingOut(TrainingIn):
 
     id: int
     rating: int
+    blocked: bool
 
 
 class TrainingsWithPagination(BaseModel):

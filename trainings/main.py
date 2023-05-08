@@ -120,8 +120,10 @@ async def create_training(
     session: Session = Depends(get_db)
 ) -> TrainingOut:
     """Create a training."""
+    logging.info("Validating permissions. Headers: %s", request.headers)
     permissions = get_permissions(request.headers, Client(), CONFIGURATION)
     assert_can_create_training(permissions)
+    logging.info("Saving media...")
     training_to_create.media = save(training_to_create.media)
     logging.info("Creating training", **training_to_create.dict())
     m.REQUEST_COUNTER.labels(BASE_URI, "post").inc()
