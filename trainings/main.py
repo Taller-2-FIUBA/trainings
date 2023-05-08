@@ -1,13 +1,15 @@
 """Requests handlers."""
 import logging
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Request
 from environ import to_config
 from prometheus_client import start_http_server
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
+from httpx import Client
 
 import trainings.metrics as m
+from trainings.authorization import assert_can_create_training, get_permissions
 from trainings.config import AppConfig
 from trainings.database.url import get_database_url
 from trainings.database.models import Base
@@ -112,10 +114,13 @@ async def get_training(
     response_model_exclude_none=True,
 )
 async def create_training(
+    request: Request,
     training_to_create: TrainingIn,
     session: Session = Depends(get_db)
 ) -> TrainingOut:
     """Create a training."""
+    permissions = get_permissions(request.headers, Client(), CONFIGURATION)
+    assert_can_create_training(permissions)
     logging.info("Creating training", **training_to_create.dict())
     m.REQUEST_COUNTER.labels(BASE_URI, "post").inc()
     with session as open_session:

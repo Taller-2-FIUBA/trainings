@@ -1,4 +1,5 @@
 # pylint: disable= missing-module-docstring, missing-function-docstring
+from unittest.mock import MagicMock, patch
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -9,6 +10,8 @@ from tests.util.assert_helpers import are_equal
 from trainings.main import EXERCISES_URI, TYPES_URI, app, get_db, BASE_URI
 from trainings.database.models import Base
 from trainings.database.data import init_db
+
+GET_PERMISSIONS_MOCK = MagicMock(return_value={"a": "b"})
 
 # Setup
 
@@ -111,7 +114,9 @@ def test_when_filtering_by_trainer_id_banana_returns_no_training():
     assert are_equal(response.json(), c.EMPTY_RESPONSE_WITH_PAGINATION, {})
 
 
-def test_post_training():
+@patch("trainings.main.get_permissions", GET_PERMISSIONS_MOCK)
+@patch("trainings.main.assert_can_create_training")
+def test_post_training(assert_can_create_training_mock):
     response = client.post(BASE_URI, json=c.TRAINING_TO_BE_CREATED)
     assert response.status_code == 200
     assert are_equal(
@@ -119,6 +124,8 @@ def test_post_training():
         c.TRAINING_TO_BE_CREATED | {"rating": 0},
         {"id"}
     )
+    GET_PERMISSIONS_MOCK.assert_called_once()
+    assert_can_create_training_mock.assert_called_once_with({"a": "b"})
 
 
 def test_get_training_by_id():

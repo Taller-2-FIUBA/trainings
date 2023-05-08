@@ -21,4 +21,11 @@ class AppConfig:
         database = var("postgres")
         create_structures = var(False, converter=bool)
 
+    @config
+    class AUTH:
+        """Authentication service configuration."""
+
+        host = var("auth-service.fiufit.svc.cluster.local:8002")
+
     db = group(DB)  # type: ignore
+    auth = group(AUTH)  # type: ignore

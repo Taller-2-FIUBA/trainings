@@ -69,3 +69,13 @@ def test_when_environment_db_database_expect_fiufit():
 def test_when_environment_db_create_structures_expect_true():
     cnf = to_config(AppConfig)
     assert cnf.db.create_structures
+
+
+@patch.dict(
+    environ,
+    {"TRAININGS_AUTH_HOST": "auth-service.fiufit.svc.cluster.local:8002"},
+    clear=True
+)
+def test_when_environment_auth_host_expect_auth_service():
+    cnf = to_config(AppConfig)
+    assert cnf.auth.host == "auth-service.fiufit.svc.cluster.local:8002"
