@@ -1,7 +1,7 @@
 """Hydrate DTOs from database objects."""
 from typing import List
 from trainings.database.models import TrainingType
-from trainings.types.dto import TrainingTypesOut
+from trainings.training_types.dto import TrainingTypesOut
 
 
 def hydrate(training_types: List[TrainingType]) -> TrainingTypesOut:
