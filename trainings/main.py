@@ -95,6 +95,7 @@ async def get_trainings(
     BASE_URI + "/{training_id}",
     response_model=TrainingOut,
     response_model_exclude_none=True,
+    status_code=201,
 )
 async def get_training(
     training_id: int,

@@ -138,7 +138,7 @@ def test_post_training(assert_can_create_training_mock):
 
 def test_get_training_by_id():
     response = client.get(BASE_URI + "/1")
-    assert response.status_code == 200
+    assert response.status_code == 201
     assert are_equal(response.json(), c.FIRST_TRAINING, {})
 
 
