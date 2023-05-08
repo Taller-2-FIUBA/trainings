@@ -66,7 +66,7 @@ TRAINING_TO_BE_CREATED = {
     "description": "A training created with POST.",
     "type": "Arm",
     "difficulty": "Medium",
-    "media": "a_firebase_id",
+    "media": "blobOfMedia",
     "exercises": [
         {
             "name": "Hammer curl",

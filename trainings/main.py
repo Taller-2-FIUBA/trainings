@@ -7,6 +7,7 @@ from prometheus_client import start_http_server
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from httpx import Client
+from trainings.firebase import save
 
 import trainings.metrics as m
 from trainings.authorization import assert_can_create_training, get_permissions
@@ -121,6 +122,7 @@ async def create_training(
     """Create a training."""
     permissions = get_permissions(request.headers, Client(), CONFIGURATION)
     assert_can_create_training(permissions)
+    training_to_create.media = save(training_to_create.media)
     logging.info("Creating training", **training_to_create.dict())
     m.REQUEST_COUNTER.labels(BASE_URI, "post").inc()
     with session as open_session:
