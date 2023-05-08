@@ -24,9 +24,9 @@ from trainings.trainings.dto import (
 )
 from trainings.trainings.dao import browse, add, read
 from trainings.trainings.hydrator import hydrate as hydrate_dto
-from trainings.types.dto import TrainingTypesOut
-from trainings.types.dao import browse as browse_types
-from trainings.types.hydrator import hydrate as hydrate_training_types
+from trainings.training_types.dto import TrainingTypesOut
+from trainings.training_types.dao import browse as browse_types
+from trainings.training_types.hydrator import hydrate as hydrate_training_types
 from trainings.exercises.dto import ExercisesOut
 from trainings.exercises.dao import browse as browse_exercises
 from trainings.exercises.hydrator import hydrate as hydrate_exercises
