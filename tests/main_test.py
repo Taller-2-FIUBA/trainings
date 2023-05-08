@@ -142,6 +142,12 @@ def test_get_training_by_id():
     assert are_equal(response.json(), c.FIRST_TRAINING, {})
 
 
+def test_when_getting_training_of_id_999_expect_error():
+    response = client.get(BASE_URI + "/999")
+    assert response.status_code == 404
+    assert response.json() == {'detail': 'Training not found.'}
+
+
 def test_when_getting_training_types_expect_list():
     response = client.get(TYPES_URI)
     assert response.status_code == 200, response.json()
