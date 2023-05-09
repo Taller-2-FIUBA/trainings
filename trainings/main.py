@@ -8,7 +8,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 from httpx import Client
-from trainings.firebase import save
+from trainings.database.data import init_db
 
 import trainings.metrics as m
 from trainings.authorization import assert_can_create_training, get_permissions
@@ -30,6 +30,7 @@ from trainings.training_types.hydrator import hydrate as hydrate_training_types
 from trainings.exercises.dto import ExercisesOut
 from trainings.exercises.dao import browse as browse_exercises
 from trainings.exercises.hydrator import hydrate as hydrate_exercises
+from trainings.firebase import save
 
 BASE_URI = "/trainings"
 TYPES_URI = BASE_URI + "/types/"
@@ -43,15 +44,17 @@ app = FastAPI(
 start_http_server(CONFIGURATION.prometheus_port)
 logging.basicConfig(encoding='utf-8', level=CONFIGURATION.log_level.upper())
 
-
 ENGINE = create_engine(get_database_url(CONFIGURATION))
-if CONFIGURATION.db.create_structures:
-    Base.metadata.create_all(bind=ENGINE)
 
 
 def get_db() -> Session:
     """Create a session."""
     return Session(autocommit=False, autoflush=False, bind=ENGINE)
+
+
+if CONFIGURATION.db.create_structures:
+    Base.metadata.create_all(bind=ENGINE)
+    init_db(get_db())
 
 
 # pylint: disable=too-many-arguments
@@ -132,7 +135,7 @@ async def create_training(
     assert_can_create_training(permissions)
     logging.info("Saving media...")
     training_to_create.media = save(training_to_create.media)
-    logging.info("Creating training", **training_to_create.dict())
+    logging.info("Creating training %s", training_to_create.dict())
     m.REQUEST_COUNTER.labels(BASE_URI, "post").inc()
     with session as open_session:
         created_training = add(

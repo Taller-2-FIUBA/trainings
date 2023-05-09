@@ -1,22 +1,27 @@
 """Database initialization."""
-from typing import Any, List
+import logging
+from typing import List, Dict, Any
 from sqlalchemy.orm import Session
+from sqlalchemy.dialects.postgresql import insert
 
 from trainings.database.models import (
-    Difficulty, Exercise, Training, TrainingExercise, TrainingType
+    Difficulty, Exercise, TrainingType
 )
 
 
-def _insert(session, records: List[Any]) -> None:
-    """Insert records."""
-    for record in records:
-        session.add(record)
-    session.commit()
+def get_columns_and_cells(models: List) -> List[Dict[str, Any]]:
+    """Return columns and values from models, used for raw INSERT VALUES."""
+    columns_and_cells = []
+    for model in models:
+        column_and_cell = model.__dict__
+        column_and_cell.pop("_sa_instance_state")
+        columns_and_cells.append(column_and_cell)
+    return columns_and_cells
 
 
-def insert_training_types(session: Session):
-    """Insert training types."""
-    training_types = [
+def get_training_types() -> List[TrainingType]:
+    """Return training types records."""
+    return [
         TrainingType(id=1, name="Cardio"),
         TrainingType(id=2, name="Leg"),
         TrainingType(id=3, name="Arm"),
@@ -24,22 +29,49 @@ def insert_training_types(session: Session):
         TrainingType(id=5, name="Back"),
         TrainingType(id=6, name="Abdomen"),
     ]
-    _insert(session, training_types)
 
 
-def insert_training_difficulties(session: Session):
-    """Insert training difficulties."""
-    difficulties = [
+def insert_in_postgres_ignoring_existing(
+    session: Session, table, rows: List
+) -> None:
+    """
+    Run an insert statement with ON CONFLICT DO NOTHING.
+
+    This only works with PostgreSQL.
+    """
+    session.execute(
+        insert(table)
+        .values(get_columns_and_cells(rows))
+        .on_conflict_do_nothing()
+    )
+
+
+def insert_training_types(session: Session):
+    """Insert training types."""
+    insert_in_postgres_ignoring_existing(
+        session, TrainingType, get_training_types()
+    )
+
+
+def get_training_difficulties() -> List[Difficulty]:
+    """Return training difficulty records."""
+    return [
         Difficulty(id=1, name="Easy"),
         Difficulty(id=2, name="Medium"),
         Difficulty(id=3, name="Hard"),
     ]
-    _insert(session, difficulties)
 
 
-def insert_exercises(session: Session):
-    """Insert training exercises."""
-    exercises = [
+def insert_training_difficulties(session: Session):
+    """Insert training difficulties."""
+    insert_in_postgres_ignoring_existing(
+        session, Difficulty, get_training_difficulties()
+    )
+
+
+def get_exercises() -> List[Exercise]:
+    """Return training exercise records."""
+    return [
         Exercise(id=1, name="Walk", type_id=1, unit="metre"),
         Exercise(id=2, name="Walk", type_id=1, unit="second"),
         Exercise(id=3, name="Run", type_id=1, unit="metre"),
@@ -66,52 +98,20 @@ def insert_exercises(session: Session):
         Exercise(id=81, name="Bicycle crunch", type_id=6, unit=None),
         Exercise(id=82, name="Plank", type_id=6, unit=None),
     ]
-    _insert(session, exercises)
 
 
-def insert_trainings(session: Session) -> None:
-    """Create initial trainings."""
-    trainings = [
-        Training(
-            id=1,
-            trainer_id="Ju6JXm1S8rVQfyC18mqL418JdgE2",
-            tittle="The first training.",
-            description="This is the first training.",
-            type_id=1,
-            difficulty_id=1,
-            media="a_firebase_id",
-            blocked=False,
-        ),
-        Training(
-            id=2,
-            trainer_id="tomato",
-            tittle="The tomato training.",
-            description="This is the tomato training.",
-            type_id=2,
-            difficulty_id=2,
-            media="a_firebase_id",
-            blocked=False,
-        ),
-    ]
-    _insert(session, trainings)
-
-
-def insert_training_exercises(session: Session) -> None:
-    """Create initial training exercises."""
-    exercises = [
-        TrainingExercise(training_id=1, exercise_id=1, count=30, series=1),
-        TrainingExercise(training_id=1, exercise_id=3, count=30, series=1),
-        TrainingExercise(training_id=1, exercise_id=5, count=15, series=3),
-        TrainingExercise(training_id=2, exercise_id=20, count=15, series=3),
-    ]
-    _insert(session, exercises)
+def insert_exercises(session: Session):
+    """Insert training exercises."""
+    insert_in_postgres_ignoring_existing(session, Exercise, get_exercises())
 
 
 def init_db(session: Session) -> None:
     """Create basic data."""
+    logging.info("Inserting initial data...")
     with session as open_session:
+        logging.info("Inserting training types...")
         insert_training_types(open_session)
+        logging.info("Inserting training difficulties...")
         insert_training_difficulties(open_session)
+        logging.info("Inserting training exercises...")
         insert_exercises(open_session)
-        insert_trainings(open_session)
-        insert_training_exercises(open_session)

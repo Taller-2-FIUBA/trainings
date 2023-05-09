@@ -17,18 +17,20 @@ def test_when_external_auth_service_returns_credentials_expect_them():
     response.status_code = 200
     response.json = MagicMock(return_value={"data": expected_credentials})
     # Setup testing doubles
-    dummy_headers = MagicMock()
+    headers_stub = MagicMock()
+    headers_stub.get = MagicMock(return_value="banana")
     config_stub = MagicMock()
     config_stub.auth.host = expected_host
     client_spy = MagicMock()
     client_spy.get = MagicMock(return_value=response)
     # Exercise
-    permissions = get_permissions(dummy_headers, client_spy, config_stub)
+    permissions = get_permissions(headers_stub, client_spy, config_stub)
     # Assert data
     assert permissions == expected_credentials
     # Assert expectations
+    headers_stub.get.assert_called_once_with("Authorization")
     client_spy.get.assert_called_once_with(
-        expected_url, headers=dummy_headers
+        expected_url, headers={"Authorization": "banana"}
     )
 
 
