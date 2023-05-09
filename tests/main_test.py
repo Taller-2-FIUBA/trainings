@@ -6,10 +6,10 @@ from sqlalchemy.orm import sessionmaker
 
 import tests.util.constants as c
 from tests.util.assert_helpers import are_equal
+from tests.util.data import init_test_db
 
 from trainings.main import EXERCISES_URI, TYPES_URI, app, get_db, BASE_URI
 from trainings.database.models import Base
-from trainings.database.data import init_db
 
 GET_PERMISSIONS_MOCK = MagicMock(return_value={"a": "b"})
 FIREBASE_SAVE_MOCK = MagicMock(return_value="a_firebase_id")
@@ -28,7 +28,7 @@ TestingSessionLocal = sessionmaker(
 
 Base.metadata.drop_all(bind=engine)
 Base.metadata.create_all(bind=engine)
-init_db(TestingSessionLocal())
+init_test_db(TestingSessionLocal())
 
 
 def override_get_db():
