@@ -18,7 +18,7 @@ def hydrate(session: Session, training: TrainingIn) -> Training:
     logging.info("Building exercises for training...")
     for training_exercise in training.exercises:
         logging.debug(
-            "Building exercise", **training_exercise.dict()
+            "Building exercise %s", training_exercise.dict()
         )
         exercises.append(
             TrainingExercise(
@@ -41,5 +41,5 @@ def hydrate(session: Session, training: TrainingIn) -> Training:
         ).one(),
     }
     fields = training.dict() | foreign_keys
-    logging.debug("Exercise built", **fields)
+    logging.debug("Exercise built %s", fields)
     return Training(**fields)

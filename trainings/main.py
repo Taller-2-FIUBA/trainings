@@ -135,7 +135,7 @@ async def create_training(
     assert_can_create_training(permissions)
     logging.info("Saving media...")
     training_to_create.media = save(training_to_create.media)
-    logging.info("Creating training", **training_to_create.dict())
+    logging.info("Creating training %s", training_to_create.dict())
     m.REQUEST_COUNTER.labels(BASE_URI, "post").inc()
     with session as open_session:
         created_training = add(
