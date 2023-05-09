@@ -44,7 +44,7 @@ app = FastAPI(
 start_http_server(CONFIGURATION.prometheus_port)
 logging.basicConfig(encoding='utf-8', level=CONFIGURATION.log_level.upper())
 
-ENGINE = create_engine(get_database_url(CONFIGURATION), ssl=True)
+ENGINE = create_engine(get_database_url(CONFIGURATION), sslmode="require")
 
 
 def get_db() -> Session:
