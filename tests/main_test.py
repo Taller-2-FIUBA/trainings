@@ -43,7 +43,11 @@ app.dependency_overrides[get_db] = override_get_db
 
 
 def test_get_all_trainings():
-    expected_trainings = [c.FIRST_TRAINING, c.TOMATO_TRAINING]
+    expected_trainings = [
+        c.FIRST_TRAINING,
+        c.TOMATO_TRAINING,
+        c.TO_BLOCK_TRAINING,
+    ]
     response = client.get(BASE_URI)
     assert response.status_code == 200
     assert are_equal(
@@ -274,3 +278,10 @@ def test_when_getting_exercises_expect_list():
     response = client.get(EXERCISES_URI)
     assert response.status_code == 200, response.json()
     assert are_equal(response.json(), c.EXPECTED_EXERCISES, {})
+
+
+def test_when_blocking_exercises_expect_blocked_to_be_true():
+    response = client.patch(
+        BASE_URI + "/3", json={"blocked": True}
+    )
+    assert response.status_code == 204, response.json()

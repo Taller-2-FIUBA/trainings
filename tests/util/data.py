@@ -53,6 +53,16 @@ def insert_trainings(session: Session) -> None:
             media="a_firebase_id",
             blocked=False,
         ),
+        Training(
+            id=3,
+            trainer_id="naughty_trainer",
+            tittle="The training to be blocked.",
+            description="This is going to be blocked and unblocked.",
+            type_id=3,
+            difficulty_id=3,
+            media="a_firebase_id",
+            blocked=False,
+        ),
     ]
     _insert(session, trainings)
 
@@ -64,6 +74,7 @@ def insert_training_exercises(session: Session) -> None:
         TrainingExercise(training_id=1, exercise_id=3, count=30, series=1),
         TrainingExercise(training_id=1, exercise_id=5, count=15, series=3),
         TrainingExercise(training_id=2, exercise_id=20, count=15, series=3),
+        TrainingExercise(training_id=3, exercise_id=31, count=15, series=3),
     ]
     _insert(session, exercises)
 

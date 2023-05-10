@@ -19,10 +19,11 @@ from trainings.database.hydrator import hydrate as hydrate_model
 from trainings.trainings.dto import (
     TrainingIn,
     TrainingOut,
+    TrainingPatch,
     TrainingsWithPagination,
     TrainingFilters,
 )
-from trainings.trainings.dao import browse, add, read
+from trainings.trainings.dao import browse, add, edit, read
 from trainings.trainings.hydrator import hydrate as hydrate_dto
 from trainings.training_types.dto import TrainingTypesOut
 from trainings.training_types.dao import browse as browse_types
@@ -120,6 +121,27 @@ async def get_training(
         ) from error
     logging.info("Building DTO...")
     return hydrate_dto(training)
+
+
+@app.patch(
+    BASE_URI + "/{training_id}",
+    status_code=204,
+)
+async def modify_training(
+    training_id: int,
+    values_to_update: TrainingPatch,
+    session: Session = Depends(get_db),
+):
+    """Modify one training."""
+    m.REQUEST_COUNTER.labels(BASE_URI, "patch").inc()
+    columns_and_values = values_to_update.dict()
+    logging.info(
+        "Updating values (%s) of training %d...",
+        columns_and_values,
+        training_id
+    )
+    with session as open_session:
+        edit(open_session, training_id, columns_and_values)
 
 
 @app.post(
