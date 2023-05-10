@@ -140,8 +140,15 @@ async def modify_training(
         columns_and_values,
         training_id
     )
-    with session as open_session:
-        edit(open_session, training_id, columns_and_values)
+    try:
+        with session as open_session:
+            logging.info("Searching for training...")
+            read(open_session, training_id)
+            edit(open_session, training_id, columns_and_values)
+    except NoResultFound as error:
+        raise HTTPException(
+            detail="Training not found.", status_code=404
+        ) from error
 
 
 @app.post(

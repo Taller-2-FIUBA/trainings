@@ -280,8 +280,16 @@ def test_when_getting_exercises_expect_list():
     assert are_equal(response.json(), c.EXPECTED_EXERCISES, {})
 
 
-def test_when_blocking_exercises_expect_blocked_to_be_true():
+def test_when_blocking_training_of_id_3_expect_blocked_to_be_true():
     response = client.patch(
         BASE_URI + "/3", json={"blocked": True}
     )
     assert response.status_code == 204, response.json()
+
+
+def test_when_blocking_training_of_id_9999_expect_error():
+    response = client.patch(
+        BASE_URI + "/999", json={"blocked": True}
+    )
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Training not found."}
