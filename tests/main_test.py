@@ -281,10 +281,28 @@ def test_when_getting_exercises_expect_list():
 
 
 def test_when_blocking_training_of_id_3_expect_blocked_to_be_true():
-    response = client.patch(
-        BASE_URI + "/3", json={"blocked": True}
-    )
+    url = BASE_URI + "/3"
+    ignored_values = {"rating", "media"}
+    unblocked_training = c.TO_BLOCK_TRAINING | {"blocked": False}
+    blocked_training = c.TO_BLOCK_TRAINING | {"blocked": True}
+    # Assert that is not blocked when starting
+    response = client.get(url)
+    assert response.status_code == 201
+    assert are_equal(response.json(), unblocked_training, ignored_values)
+    # Block it
+    response = client.patch(url, json={"blocked": True})
     assert response.status_code == 204, response.json()
+    # Assert it is blocked
+    response = client.get(url)
+    assert response.status_code == 201
+    assert are_equal(response.json(), blocked_training, ignored_values)
+    # Unblock it
+    response = client.patch(url, json={"blocked": False})
+    assert response.status_code == 204, response.json()
+    # Assert it is unblocked
+    response = client.get(url)
+    assert response.status_code == 201
+    assert are_equal(response.json(), unblocked_training, ignored_values)
 
 
 def test_when_blocking_training_of_id_9999_expect_error():
