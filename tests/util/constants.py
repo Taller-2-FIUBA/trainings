@@ -54,6 +54,25 @@ TOMATO_TRAINING = {
     ]
 }
 
+TO_BLOCK_TRAINING = {
+    "id": 3,
+    "trainer_id": "naughty_trainer",
+    "tittle": "The training to be blocked.",
+    "description": "This is going to be blocked and unblocked.",
+    "type": "Arm",
+    "difficulty": "Hard",
+    "media": "a_firebase_id",
+    "rating": 0,
+    "blocked": False,
+    "exercises": [
+        {
+            "name": "Hammer curl",
+            "type": "Arm",
+            "count": 15,
+            "series": 3,
+        },
+    ]
+}
 
 EMPTY_RESPONSE_WITH_PAGINATION = {
     "items": [],

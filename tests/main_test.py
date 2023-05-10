@@ -43,7 +43,11 @@ app.dependency_overrides[get_db] = override_get_db
 
 
 def test_get_all_trainings():
-    expected_trainings = [c.FIRST_TRAINING, c.TOMATO_TRAINING]
+    expected_trainings = [
+        c.FIRST_TRAINING,
+        c.TOMATO_TRAINING,
+        c.TO_BLOCK_TRAINING,
+    ]
     response = client.get(BASE_URI)
     assert response.status_code == 200
     assert are_equal(
@@ -274,3 +278,36 @@ def test_when_getting_exercises_expect_list():
     response = client.get(EXERCISES_URI)
     assert response.status_code == 200, response.json()
     assert are_equal(response.json(), c.EXPECTED_EXERCISES, {})
+
+
+def test_when_blocking_training_of_id_3_expect_blocked_to_be_true():
+    url = BASE_URI + "/3"
+    ignored_values = {"rating", "media"}
+    unblocked_training = c.TO_BLOCK_TRAINING | {"blocked": False}
+    blocked_training = c.TO_BLOCK_TRAINING | {"blocked": True}
+    # Assert that is not blocked when starting
+    response = client.get(url)
+    assert response.status_code == 201
+    assert are_equal(response.json(), unblocked_training, ignored_values)
+    # Block it
+    response = client.patch(url, json={"blocked": True})
+    assert response.status_code == 204, response.json()
+    # Assert it is blocked
+    response = client.get(url)
+    assert response.status_code == 201
+    assert are_equal(response.json(), blocked_training, ignored_values)
+    # Unblock it
+    response = client.patch(url, json={"blocked": False})
+    assert response.status_code == 204, response.json()
+    # Assert it is unblocked
+    response = client.get(url)
+    assert response.status_code == 201
+    assert are_equal(response.json(), unblocked_training, ignored_values)
+
+
+def test_when_blocking_training_of_id_9999_expect_error():
+    response = client.patch(
+        BASE_URI + "/999", json={"blocked": True}
+    )
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Training not found."}

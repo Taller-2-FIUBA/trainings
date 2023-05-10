@@ -51,3 +51,9 @@ class TrainingFilters(BaseModel):
     trainer_id: Optional[str]
     type: Optional[str]
     difficulty: Optional[str]
+
+
+class TrainingPatch(BaseModel):
+    """Fields from training that can be updated."""
+
+    blocked: bool

@@ -1,5 +1,6 @@
 """DAO with B.R.E.A.D. functions for trainings."""
 import logging
+from typing import Any, Dict
 
 from sqlalchemy.orm import Session
 from trainings.database.models import Training
@@ -19,6 +20,15 @@ def read(session: Session, training_id: int) -> Training:
     return session.query(Training).filter(
         Training.id == training_id,
     ).one()
+
+
+def edit(session: Session, training_id: int, fields_to_update: Dict[str, Any]):
+    """Update fields in a training."""
+    logging.info("Running update query...")
+    session.query(Training)\
+        .filter(Training.id == training_id)\
+        .update(values=fields_to_update)
+    session.commit()
 
 
 def add(session: Session, training: Training) -> Training:
