@@ -5,7 +5,7 @@ from trainings.database.data import (
     get_training_difficulties, get_training_types, get_exercises
 )
 
-from trainings.database.models import Training, TrainingExercise
+from trainings.database.models import Training, TrainingExercise, Users
 
 
 def _insert(session, records: List[Any]) -> None:
@@ -79,6 +79,29 @@ def insert_training_exercises(session: Session) -> None:
     _insert(session, exercises)
 
 
+def insert_users(session: Session):
+    """Insert toy users."""
+    _insert(
+        session,
+        [
+            Users(
+                id="1",
+                email="blah",
+                username="blah",
+                name="blah",
+                surname="blah",
+                height=1.0,
+                weight=1,
+                birth_date="blah",
+                location="blah",
+                registration_date="blah",
+                is_athlete=False,
+                is_blocked=False,
+            ),
+        ]
+    )
+
+
 def init_test_db(session: Session) -> None:
     """Create testing data."""
     with session as open_session:
@@ -87,3 +110,4 @@ def init_test_db(session: Session) -> None:
         insert_exercises(open_session)
         insert_trainings(open_session)
         insert_training_exercises(open_session)
+        insert_users(open_session)

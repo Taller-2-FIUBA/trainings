@@ -1,6 +1,6 @@
 """Defines table structure for each table in the database."""
 from typing import List
-from sqlalchemy import Column, ForeignKey, String, Integer
+from sqlalchemy import Boolean, Column, Float, ForeignKey, String, Integer
 from sqlalchemy.orm import (
     Mapped, declarative_base, relationship, mapped_column
 )
@@ -85,6 +85,56 @@ class Training(Base):
     exercises: Mapped[List["TrainingExercise"]] = relationship(
         lazy="joined", back_populates="training"
     )
+    user: Mapped["UserTraining"] = relationship(
+        lazy="joined", back_populates="training"
+    )
 
     def __repr__(self):
         return f"<Training {self.id, self.tittle}>"
+
+
+class Users(Base):
+    """Table structure for user."""
+
+    __tablename__ = "users"
+    id = Column(String, primary_key=True, index=True)
+    email = Column(String)
+    username = Column(String)
+    name = Column(String)
+    surname = Column(String)
+    height = Column(Float)
+    weight = Column(Integer)
+    birth_date = Column(String)
+    location = Column(String)
+    registration_date = Column(String)
+    is_athlete = Column(Boolean)
+    is_blocked = Column(Boolean)
+
+    # Relationships
+    trainings: Mapped["UserTraining"] = relationship(
+        lazy="joined", back_populates="user"
+    )
+
+    def __repr__(self):
+        return f"<Users {self.id} {self.email}>"
+
+
+class UserTraining(Base):
+    """Table structure for exercises within a training."""
+
+    __tablename__ = "user_training"
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id"), primary_key=True
+    )
+    training_id: Mapped[int] = mapped_column(
+        ForeignKey("training.id"), primary_key=True
+    )
+
+    # Relationships
+    user: Mapped["Users"] = relationship(
+        lazy="joined", back_populates="trainings"
+    )
+    training: Mapped["Training"] = relationship(lazy="joined")
+
+    def __repr__(self):
+        return f"<UserTraining {self.user_id} {self.training_id}>"
