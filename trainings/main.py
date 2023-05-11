@@ -2,13 +2,13 @@
 import logging
 
 from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
 from environ import to_config
 from prometheus_client import start_http_server
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.orm.exc import NoResultFound
 from httpx import Client
-from trainings.database.data import init_db
 
 import trainings.metrics as m
 from trainings.authorization import assert_can_create_training, get_permissions
@@ -16,6 +16,7 @@ from trainings.config import AppConfig
 from trainings.database.url import get_database_url
 from trainings.database.models import Base
 from trainings.database.hydrator import hydrate as hydrate_model
+from trainings.database.data import init_db
 from trainings.trainings.dto import (
     TrainingIn,
     TrainingOut,
@@ -41,9 +42,17 @@ TYPES_URI = BASE_URI + "/types/"
 EXERCISES_URI = BASE_URI + "/exercises/"
 USER_TRAININGS_URI = "/users/{user_id}/trainings"
 CONFIGURATION = to_config(AppConfig)
+
 app = FastAPI(
     docs_url=BASE_URI + "/documentation",
     debug=CONFIGURATION.log_level.upper() == "DEBUG"
+)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origin_regex="(https://)?(.*vercel.app|localhost|local)(:3000)?",
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 start_http_server(CONFIGURATION.prometheus_port)
