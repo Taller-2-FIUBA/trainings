@@ -32,10 +32,14 @@ from trainings.exercises.dto import ExercisesOut
 from trainings.exercises.dao import browse as browse_exercises
 from trainings.exercises.hydrator import hydrate as hydrate_exercises
 from trainings.firebase import save
+from trainings.user_trainings.dto import UserTrainingIn
+from trainings.users.dao import read as read_user
+from trainings.user_trainings.dao import add as add_user_training
 
 BASE_URI = "/trainings"
 TYPES_URI = BASE_URI + "/types/"
 EXERCISES_URI = BASE_URI + "/exercises/"
+USER_TRAININGS_URI = "/users/{user_id}/trainings"
 CONFIGURATION = to_config(AppConfig)
 app = FastAPI(
     docs_url=BASE_URI + "/documentation",
@@ -202,3 +206,34 @@ async def get_exercises(session: Session = Depends(get_db)) -> ExercisesOut:
         exercises = browse_exercises(open_session)
     logging.info("Building DTOs...")
     return hydrate_exercises(exercises)
+
+
+@app.post(USER_TRAININGS_URI, status_code=204)
+async def save_training_for_user(
+    user_id: str,
+    training: UserTrainingIn,
+    session: Session = Depends(get_db),
+) -> None:
+    """Save a training in user favourites."""
+    logging.info(
+        "Saving training %d for user %s...", training.training_id, user_id
+    )
+    m.REQUEST_COUNTER.labels(USER_TRAININGS_URI, "post").inc()
+    with session as open_session:
+        try:
+            logging.info(
+                "Searching for trainingId=%d...", training.training_id
+            )
+            read(open_session, training.training_id)
+        except NoResultFound as error:
+            raise HTTPException(
+                detail="Training not found.", status_code=404
+            ) from error
+        try:
+            logging.info("Searching for userId=%s...", user_id)
+            read_user(open_session, user_id)
+        except NoResultFound as error:
+            raise HTTPException(
+                detail="User not found.", status_code=404
+            ) from error
+        add_user_training(open_session, user_id, training.training_id)
