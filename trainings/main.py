@@ -35,7 +35,10 @@ from trainings.exercises.hydrator import hydrate as hydrate_exercises
 from trainings.firebase import save
 from trainings.user_trainings.dto import UserTrainingIn
 from trainings.users.dao import read as read_user
-from trainings.user_trainings.dao import add as add_user_training
+from trainings.user_trainings.dao import (
+    add as add_user_training,
+    browse as browse_user_trainings
+)
 
 BASE_URI = "/trainings"
 TYPES_URI = BASE_URI + "/types/"
@@ -263,3 +266,38 @@ async def save_training_for_user(
                 detail="User not found.", status_code=404
             ) from error
         add_user_training(open_session, user_id, training.training_id)
+
+
+@app.get(
+    USER_TRAININGS_URI,
+    response_model=TrainingsWithPagination,
+    response_model_exclude_none=True,
+)
+async def save_favourite_training_for_user(
+    user_id: str,
+    offset: int = 0,
+    limit: int = 10,
+    session: Session = Depends(get_db),
+) -> TrainingsWithPagination:
+    """Return a user favourite trainings."""
+    logging.info("Getting trainings for user %s...", user_id)
+    m.REQUEST_COUNTER.labels(USER_TRAININGS_URI, "get").inc()
+    with session as open_session:
+        try:
+            logging.info("Searching for userId=%s...", user_id)
+            read_user(open_session, user_id)
+        except NoResultFound as error:
+            raise HTTPException(
+                detail="User not found.", status_code=404
+            ) from error
+        user = browse_user_trainings(open_session, user_id, offset, limit)
+    dtos = []
+    logging.info("Building DTOs...")
+    for user_trainings in user.trainings:
+        logging.debug("Building DTO of %s...", user_trainings.__dict__)
+        dtos.append(hydrate_dto(user_trainings.training))
+    return TrainingsWithPagination(
+        items=dtos,
+        offset=offset,
+        limit=limit,
+    )

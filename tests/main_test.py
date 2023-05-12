@@ -330,6 +330,29 @@ def test_when_add_training_for_not_existing_user_expect_404():
     assert response.json() == {"detail": "User not found."}
 
 
+def test_when_getting_trainings_for_a_user_expect_first_and_tomato():
+    response = client.get("/users/2/trainings")
+    assert response.status_code == 200, response.json()
+    expected_trainings = [c.FIRST_TRAINING, c.TOMATO_TRAINING]
+    assert are_equal(
+        response.json(),
+        c.EMPTY_RESPONSE_WITH_PAGINATION | {"items": expected_trainings},
+        {},
+    )
+
+
+def test_when_getting_trainings_for_a_user_without_favourites_expect_empty():
+    response = client.get("/users/3/trainings")
+    assert response.status_code == 200, response.json()
+    assert are_equal(response.json(), c.EMPTY_RESPONSE_WITH_PAGINATION, {})
+
+
+def test_when_getting_trainings_for_not_existing_user_expect_404():
+    response = client.post("/users/999/trainings", json={"training_id": 1})
+    assert response.status_code == 404, response.json()
+    assert response.json() == {"detail": "User not found."}
+
+
 HEADERS = {
     "authority": "users-ingress-taller2-marianocinalli.cloud.okteto.net",
     "accept": "/",
