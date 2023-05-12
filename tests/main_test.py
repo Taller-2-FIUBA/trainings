@@ -394,6 +394,11 @@ def test_when_getting_trainings_for_not_existing_user_expect_404():
     assert response.json() == {"detail": "User not found."}
 
 
+def test_when_getting_swagger_ui_expect_200():
+    response = client.get(BASE_URI + "/documentation/")
+    assert response.status_code == 200, response.json()
+
+
 HEADERS = {
     "authority": "users-ingress-taller2-marianocinalli.cloud.okteto.net",
     "accept": "/",
