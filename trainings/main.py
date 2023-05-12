@@ -47,12 +47,29 @@ app = FastAPI(
     docs_url=BASE_URI + "/documentation",
     debug=CONFIGURATION.log_level.upper() == "DEBUG"
 )
+METHODS = [
+    "GET",
+    "get",
+    "POST",
+    "post",
+    "PUT",
+    "put",
+    "PATCH",
+    "patch",
+    "OPTIONS",
+    "options",
+    "DELETE",
+    "delete",
+    "HEAD",
+    "head",
+]
+ORIGIN_REGEX = "(http)?(s)?(://)?(.*vercel.app|localhost|local)(:3000)?.*"
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex="(https://)?(.*vercel.app|localhost|local)(:3000)?",
+    allow_origin_regex=ORIGIN_REGEX,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=METHODS,
+    allow_headers=['*']
 )
 
 start_http_server(CONFIGURATION.prometheus_port)
