@@ -111,7 +111,7 @@ class Users(Base):
     is_blocked = Column(Boolean)
 
     # Relationships
-    trainings: Mapped["UserTraining"] = relationship(
+    trainings: Mapped[List["UserTraining"]] = relationship(
         lazy="joined", back_populates="user"
     )
 

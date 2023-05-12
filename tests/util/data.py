@@ -5,7 +5,12 @@ from trainings.database.data import (
     get_training_difficulties, get_training_types, get_exercises
 )
 
-from trainings.database.models import Training, TrainingExercise, Users
+from trainings.database.models import (
+    Training,
+    TrainingExercise,
+    UserTraining,
+    Users
+)
 
 
 def _insert(session, records: List[Any]) -> None:
@@ -98,6 +103,45 @@ def insert_users(session: Session):
                 is_athlete=False,
                 is_blocked=False,
             ),
+            Users(
+                id="2",
+                email="IHaveFavouriteTrainings",
+                username="IHaveFavouriteTrainings",
+                name="IHaveFavouriteTrainings",
+                surname="IHaveFavouriteTrainings",
+                height=1.0,
+                weight=1,
+                birth_date="IHaveFavouriteTrainings",
+                location="IHaveFavouriteTrainings",
+                registration_date="IHaveFavouriteTrainings",
+                is_athlete=False,
+                is_blocked=False,
+            ),
+            Users(
+                id="3",
+                email="IDoNotHaveFavouriteTrainings",
+                username="IDoNotHaveFavouriteTrainings",
+                name="IDoNotHaveFavouriteTrainings",
+                surname="IDoNotHaveFavouriteTrainings",
+                height=1.0,
+                weight=1,
+                birth_date="IDoNotHaveFavouriteTrainings",
+                location="IDoNotHaveFavouriteTrainings",
+                registration_date="IDoNotHaveFavouriteTrainings",
+                is_athlete=False,
+                is_blocked=False,
+            ),
+        ]
+    )
+
+
+def insert_user_trainings(session: Session):
+    """Insert user trainings."""
+    _insert(
+        session,
+        [
+            UserTraining(user_id=2, training_id=1),
+            UserTraining(user_id=2, training_id=2),
         ]
     )
 
@@ -111,3 +155,4 @@ def init_test_db(session: Session) -> None:
         insert_trainings(open_session)
         insert_training_exercises(open_session)
         insert_users(open_session)
+        insert_user_trainings(open_session)
