@@ -47,6 +47,7 @@ def test_get_all_trainings():
         c.FIRST_TRAINING,
         c.TOMATO_TRAINING,
         c.TO_BLOCK_TRAINING,
+        c.TO_EDIT_TRAINING,
     ]
     response = client.get(BASE_URI)
     assert response.status_code == 200
@@ -305,6 +306,46 @@ def test_when_blocking_training_of_id_3_expect_blocked_to_be_true():
     assert are_equal(response.json(), unblocked_training, ignored_values)
 
 
+def test_when_editing_training_4_tittle_expect_new_tittle():
+    url = BASE_URI + "/4"
+    original_tittle = "This training will be modified, trainer is indecisive."
+    edited_tittle = {"tittle": "Trainer has decided."}
+    # Assert original training
+    response = client.get(url)
+    assert response.status_code == 201
+    assert response.json()["tittle"] == original_tittle
+    # Edit it
+    response = client.patch(url, json=edited_tittle)
+    assert response.status_code == 204, response.json()
+    # Assert it has new tittle
+    response = client.get(url)
+    assert response.status_code == 201
+    assert response.json()["tittle"] == "Trainer has decided."
+
+
+def test_when_editing_training_4_description_expect_new_description():
+    url = BASE_URI + "/4"
+    edited_description = {"description": "This will never change."}
+    # Assert original training
+    response = client.get(url)
+    assert response.status_code == 201
+    assert response.json()["description"] == "This is going to change."
+    # Edit it
+    response = client.patch(url, json=edited_description)
+    assert response.status_code == 204, response.json()
+    # Assert it has new description
+    response = client.get(url)
+    assert response.status_code == 201
+    assert response.json()["description"] == "This will never change."
+
+
+def test_when_editing_training_4_media_expect_new_media():
+    url = BASE_URI + "/4"
+    edited_media = {"media": "MyNewMedia"}
+    response = client.patch(url, json=edited_media)
+    assert response.status_code == 204, response.json()
+
+
 def test_when_blocking_training_of_id_9999_expect_error():
     response = client.patch(
         BASE_URI + "/999", json={"blocked": True}
@@ -351,6 +392,11 @@ def test_when_getting_trainings_for_not_existing_user_expect_404():
     response = client.post("/users/999/trainings", json={"training_id": 1})
     assert response.status_code == 404, response.json()
     assert response.json() == {"detail": "User not found."}
+
+
+def test_when_getting_swagger_ui_expect_200():
+    response = client.get(BASE_URI + "/documentation/")
+    assert response.status_code == 200, response.json()
 
 
 HEADERS = {

@@ -1,13 +1,14 @@
 """Training filters."""
 import logging
-from typing import List
+from typing import Any, Dict, List
 
 from fastapi import HTTPException
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm import Session
 
 from trainings.database.models import Difficulty, Training, TrainingType
-from trainings.trainings.dto import TrainingFilters
+from trainings.firebase import save
+from trainings.trainings.dto import TrainingFilters, TrainingPatch
 
 
 def get_criteria(session: Session, filters: TrainingFilters) -> List:
@@ -41,3 +42,14 @@ def get_criteria(session: Session, filters: TrainingFilters) -> List:
             raise HTTPException(detail=detail, status_code=400) from error
     logging.debug("Search criteria: %s", criteria)
     return criteria
+
+
+def get_columns_and_values(patch_values: TrainingPatch) -> Dict[str, Any]:
+    """Translate body of patch method into update query columns and values."""
+    columns_and_values = {
+        k: v for k, v in patch_values.dict().items() if v is not None
+    }
+    if "media" in columns_and_values:
+        logging.info("Saving media...")
+        columns_and_values["media"] = save(patch_values.media)
+    return columns_and_values

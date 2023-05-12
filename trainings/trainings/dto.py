@@ -56,4 +56,8 @@ class TrainingFilters(BaseModel):
 class TrainingPatch(BaseModel):
     """Fields from training that can be updated."""
 
-    blocked: bool
+    tittle: Optional[str]
+    description: Optional[str]
+    difficulty: Optional[str]
+    media: Optional[str]
+    blocked: Optional[bool]

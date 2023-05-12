@@ -3,6 +3,7 @@ import logging
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.applications import get_swagger_ui_html
 from environ import to_config
 from prometheus_client import start_http_server
 from sqlalchemy import create_engine
@@ -25,6 +26,7 @@ from trainings.trainings.dto import (
     TrainingFilters,
 )
 from trainings.trainings.dao import browse, add, edit, read
+from trainings.trainings.filters import get_columns_and_values
 from trainings.trainings.hydrator import hydrate as hydrate_dto
 from trainings.training_types.dto import TrainingTypesOut
 from trainings.training_types.dao import browse as browse_types
@@ -46,10 +48,7 @@ EXERCISES_URI = BASE_URI + "/exercises/"
 USER_TRAININGS_URI = "/users/{user_id}/trainings"
 CONFIGURATION = to_config(AppConfig)
 
-app = FastAPI(
-    docs_url=BASE_URI + "/documentation",
-    debug=CONFIGURATION.log_level.upper() == "DEBUG"
-)
+app = FastAPI(debug=CONFIGURATION.log_level.upper() == "DEBUG")
 METHODS = [
     "GET",
     "get",
@@ -162,21 +161,20 @@ async def get_training(
 )
 async def modify_training(
     training_id: int,
-    values_to_update: TrainingPatch,
+    body: TrainingPatch,
     session: Session = Depends(get_db),
 ):
     """Modify one training."""
     m.REQUEST_COUNTER.labels(BASE_URI, "patch").inc()
-    columns_and_values = values_to_update.dict()
-    logging.info(
-        "Updating values (%s) of training %d...",
-        columns_and_values,
-        training_id
-    )
+    logging.info("Received values (%s) to update.", body.dict())
     try:
         with session as open_session:
             logging.info("Searching for training...")
             read(open_session, training_id)
+            columns_and_values = get_columns_and_values(body)
+            logging.info(
+                "Updating values (%s) of %s.", columns_and_values, training_id
+            )
             edit(open_session, training_id, columns_and_values)
     except NoResultFound as error:
         raise HTTPException(
@@ -300,4 +298,15 @@ async def get_favourite_training_for_user(
         items=dtos,
         offset=offset,
         limit=limit,
+    )
+
+
+@app.get(BASE_URI + "/documentation/", include_in_schema=False)
+async def custom_swagger_ui_html(req: Request):
+    """To show Swagger with API documentation."""
+    root_path = req.scope.get("root_path", "").rstrip("/")
+    openapi_url = root_path + app.openapi_url
+    return get_swagger_ui_html(
+        openapi_url=openapi_url,
+        title="FIUFIT Trainings",
     )
