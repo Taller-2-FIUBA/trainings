@@ -25,6 +25,7 @@ from trainings.trainings.dto import (
     TrainingFilters,
 )
 from trainings.trainings.dao import browse, add, edit, read
+from trainings.trainings.filters import get_columns_and_values
 from trainings.trainings.hydrator import hydrate as hydrate_dto
 from trainings.training_types.dto import TrainingTypesOut
 from trainings.training_types.dao import browse as browse_types
@@ -162,21 +163,20 @@ async def get_training(
 )
 async def modify_training(
     training_id: int,
-    values_to_update: TrainingPatch,
+    body: TrainingPatch,
     session: Session = Depends(get_db),
 ):
     """Modify one training."""
     m.REQUEST_COUNTER.labels(BASE_URI, "patch").inc()
-    columns_and_values = values_to_update.dict()
-    logging.info(
-        "Updating values (%s) of training %d...",
-        columns_and_values,
-        training_id
-    )
+    logging.info("Received values (%s) to update.", body.dict())
     try:
         with session as open_session:
             logging.info("Searching for training...")
             read(open_session, training_id)
+            columns_and_values = get_columns_and_values(body)
+            logging.info(
+                "Updating values (%s) of %s.", columns_and_values, training_id
+            )
             edit(open_session, training_id, columns_and_values)
     except NoResultFound as error:
         raise HTTPException(

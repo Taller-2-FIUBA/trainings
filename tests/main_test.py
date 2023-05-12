@@ -306,6 +306,46 @@ def test_when_blocking_training_of_id_3_expect_blocked_to_be_true():
     assert are_equal(response.json(), unblocked_training, ignored_values)
 
 
+def test_when_editing_training_4_tittle_expect_new_tittle():
+    url = BASE_URI + "/4"
+    original_tittle = "This training will be modified, trainer is indecisive."
+    edited_tittle = {"tittle": "Trainer has decided."}
+    # Assert original training
+    response = client.get(url)
+    assert response.status_code == 201
+    assert response.json()["tittle"] == original_tittle
+    # Edit it
+    response = client.patch(url, json=edited_tittle)
+    assert response.status_code == 204, response.json()
+    # Assert it has new tittle
+    response = client.get(url)
+    assert response.status_code == 201
+    assert response.json()["tittle"] == "Trainer has decided."
+
+
+def test_when_editing_training_4_description_expect_new_description():
+    url = BASE_URI + "/4"
+    edited_description = {"description": "This will never change."}
+    # Assert original training
+    response = client.get(url)
+    assert response.status_code == 201
+    assert response.json()["description"] == "This is going to change."
+    # Edit it
+    response = client.patch(url, json=edited_description)
+    assert response.status_code == 204, response.json()
+    # Assert it has new description
+    response = client.get(url)
+    assert response.status_code == 201
+    assert response.json()["description"] == "This will never change."
+
+
+def test_when_editing_training_4_media_expect_new_media():
+    url = BASE_URI + "/4"
+    edited_media = {"media": "MyNewMedia"}
+    response = client.patch(url, json=edited_media)
+    assert response.status_code == 204, response.json()
+
+
 def test_when_blocking_training_of_id_9999_expect_error():
     response = client.patch(
         BASE_URI + "/999", json={"blocked": True}
