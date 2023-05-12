@@ -273,7 +273,7 @@ async def save_training_for_user(
     response_model=TrainingsWithPagination,
     response_model_exclude_none=True,
 )
-async def save_favourite_training_for_user(
+async def get_favourite_training_for_user(
     user_id: str,
     offset: int = 0,
     limit: int = 10,
