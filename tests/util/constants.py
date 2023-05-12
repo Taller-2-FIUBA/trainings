@@ -74,6 +74,26 @@ TO_BLOCK_TRAINING = {
     ]
 }
 
+TO_EDIT_TRAINING = {
+    "id": 4,
+    "trainer_id": "indecisive_trainer",
+    "tittle": "This training will be modified, trainer is indecisive.",
+    "description": "This is going to change.",
+    "type": "Arm",
+    "difficulty": "Hard",
+    "media": "a_firebase_id",
+    "rating": 0,
+    "blocked": False,
+    "exercises": [
+        {
+            "name": "Hammer curl",
+            "type": "Arm",
+            "count": 15,
+            "series": 3,
+        },
+    ]
+}
+
 EMPTY_RESPONSE_WITH_PAGINATION = {
     "items": [],
     "offset": 0,

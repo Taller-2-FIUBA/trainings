@@ -47,6 +47,7 @@ def test_get_all_trainings():
         c.FIRST_TRAINING,
         c.TOMATO_TRAINING,
         c.TO_BLOCK_TRAINING,
+        c.TO_EDIT_TRAINING,
     ]
     response = client.get(BASE_URI)
     assert response.status_code == 200

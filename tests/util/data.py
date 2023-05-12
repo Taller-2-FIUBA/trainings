@@ -68,6 +68,16 @@ def insert_trainings(session: Session) -> None:
             media="a_firebase_id",
             blocked=False,
         ),
+        Training(
+            id=4,
+            trainer_id="indecisive_trainer",
+            tittle="This training will be modified, trainer is indecisive.",
+            description="This is going to change.",
+            type_id=3,
+            difficulty_id=3,
+            media="a_firebase_id",
+            blocked=False,
+        ),
     ]
     _insert(session, trainings)
 
@@ -80,6 +90,7 @@ def insert_training_exercises(session: Session) -> None:
         TrainingExercise(training_id=1, exercise_id=5, count=15, series=3),
         TrainingExercise(training_id=2, exercise_id=20, count=15, series=3),
         TrainingExercise(training_id=3, exercise_id=31, count=15, series=3),
+        TrainingExercise(training_id=4, exercise_id=31, count=15, series=3),
     ]
     _insert(session, exercises)
 
