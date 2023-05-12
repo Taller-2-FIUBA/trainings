@@ -1,5 +1,7 @@
 # trainings
 
+[![codecov](https://codecov.io/gh/Taller-2-FIUBA/trainings/branch/main/graph/badge.svg?token=WQwxO53hR1)](https://codecov.io/gh/Taller-2-FIUBA/trainings)
+
 Service to interact with trainings
 
 ## Virtual environment
