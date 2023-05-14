@@ -212,3 +212,19 @@ def test_when_firebase_client_x509_cert_url_is_empty_expect_url():
 def test_when_firebase_client_x509_cert_url_has_url_expect_cert_com():
     cnf = to_config(AppConfig)
     assert cnf.firebase.client_x509_cert_url == "cert.com"
+
+
+@patch.dict(environ, {}, clear=True)
+def test_when_firebase_storagebucket_is_empty_expect_url():
+    cnf = to_config(AppConfig)
+    assert cnf.firebase.storagebucket == "taller2-fiufit.appspot.com"
+
+
+@patch.dict(
+    environ,
+    {"TRAININGS_FIREBASE_STORAGEBUCKET": "bucket.com"},
+    clear=True
+)
+def test_when_firebase_storagebucket_has_url_expect_bucket_com():
+    cnf = to_config(AppConfig)
+    assert cnf.firebase.storagebucket == "bucket.com"
