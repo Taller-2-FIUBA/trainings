@@ -39,6 +39,9 @@ class AppConfig:
         client_id: str = var("117815040269453856692")
         auth_uri: str = var("https://accounts.google.com/o/oauth2/auth")
         token_uri: str = var("https://oauth2.googleapis.com/token")
+        auth_provider_x509_cert_url: str = var(
+            "https://www.googleapis.com/oauth2/v1/certs"
+        )
 
     db = group(DB)  # type: ignore
     auth = group(AUTH)  # type: ignore
