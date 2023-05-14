@@ -37,6 +37,7 @@ class AppConfig:
             "firebase-adminsdk-zwduu@taller2-fiufit.iam.gserviceaccount.com"
         )
         client_id: str = var("117815040269453856692")
+        auth_uri: str = var("https://accounts.google.com/o/oauth2/auth")
 
     db = group(DB)  # type: ignore
     auth = group(AUTH)  # type: ignore

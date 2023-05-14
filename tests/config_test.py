@@ -153,3 +153,15 @@ def test_when_firebase_client_id_is_empty_expect_client_id():
 def test_when_firebase_client_id_has_12314_expect_12314():
     cnf = to_config(AppConfig)
     assert cnf.firebase.client_id == "12314"
+
+
+@patch.dict(environ, {}, clear=True)
+def test_when_firebase_auth_uri_is_empty_expect_auth_uri():
+    cnf = to_config(AppConfig)
+    assert cnf.firebase.auth_uri == "https://accounts.google.com/o/oauth2/auth"
+
+
+@patch.dict(environ, {"TRAININGS_FIREBASE_AUTH_URI": "auth.com"}, clear=True)
+def test_when_firebase_auth_uri_has_auth_com_expect_auth_com():
+    cnf = to_config(AppConfig)
+    assert cnf.firebase.auth_uri == "auth.com"
