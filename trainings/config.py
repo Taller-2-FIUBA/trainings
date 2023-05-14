@@ -42,6 +42,10 @@ class AppConfig:
         auth_provider_x509_cert_url: str = var(
             "https://www.googleapis.com/oauth2/v1/certs"
         )
+        client_x509_cert_url: str = var(
+            "https://www.googleapis.com/robot/v1/metadata/x509/"
+            "firebase-adminsdk-zwduu%40taller2-fiufit.iam.gserviceaccount.com"
+        )
 
     db = group(DB)  # type: ignore
     auth = group(AUTH)  # type: ignore
