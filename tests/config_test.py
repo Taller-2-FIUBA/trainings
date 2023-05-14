@@ -91,3 +91,15 @@ def test_when_firebase_type_is_empty_expect_service_account():
 def test_when_firebase_type_has_fiufit_expect_fiufit():
     cnf = to_config(AppConfig)
     assert cnf.firebase.type == "fiufit"
+
+
+@patch.dict(environ, {}, clear=True)
+def test_when_firebase_project_id_is_empty_expect_service_account():
+    cnf = to_config(AppConfig)
+    assert cnf.firebase.project_id == "taller2-fiufit"
+
+
+@patch.dict(environ, {"TRAININGS_FIREBASE_PROJECT_ID": "an_id"}, clear=True)
+def test_when_firebase_project_id_has_an_id_expect_an_id():
+    cnf = to_config(AppConfig)
+    assert cnf.firebase.project_id == "an_id"

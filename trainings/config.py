@@ -30,6 +30,7 @@ class AppConfig:
     @config(prefix="FIREBASE")
     class Firebase:
         type: str = var("service_account")
+        project_id: str = var("taller2-fiufit")
 
     db = group(DB)  # type: ignore
     auth = group(AUTH)  # type: ignore
