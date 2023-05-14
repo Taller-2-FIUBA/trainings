@@ -141,3 +141,15 @@ def test_when_firebase_client_email_is_empty_expect_main():
 def test_when_firebase_client_email_has_mail_expect_mail():
     cnf = to_config(AppConfig)
     assert cnf.firebase.client_email == "mail"
+
+
+@patch.dict(environ, {}, clear=True)
+def test_when_firebase_client_id_is_empty_expect_client_id():
+    cnf = to_config(AppConfig)
+    assert cnf.firebase.client_id == "117815040269453856692"
+
+
+@patch.dict(environ, {"TRAININGS_FIREBASE_CLIENT_ID": "12314"}, clear=True)
+def test_when_firebase_client_id_has_12314_expect_12314():
+    cnf = to_config(AppConfig)
+    assert cnf.firebase.client_id == "12314"

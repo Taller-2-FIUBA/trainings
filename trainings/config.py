@@ -36,6 +36,7 @@ class AppConfig:
         client_email: str = var(
             "firebase-adminsdk-zwduu@taller2-fiufit.iam.gserviceaccount.com"
         )
+        client_id: str = var("117815040269453856692")
 
     db = group(DB)  # type: ignore
     auth = group(AUTH)  # type: ignore
