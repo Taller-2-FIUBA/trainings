@@ -116,3 +116,15 @@ def test_when_firebase_private_key_id_is_empty_expect_service_account():
 def test_when_firebase_private_key_id_has_id_expect_id():
     cnf = to_config(AppConfig)
     assert cnf.firebase.private_key_id == "id"
+
+
+@patch.dict(environ, {}, clear=True)
+def test_when_firebase_private_key_is_empty_expect_service_account():
+    cnf = to_config(AppConfig)
+    assert cnf.firebase.private_key == "https://tenor.com/bhDEJ.gif"
+
+
+@patch.dict(environ, {"TRAININGS_FIREBASE_PRIVATE_KEY": "a_pk"}, clear=True)
+def test_when_firebase_private_key_has_a_pk_expect_a_pk():
+    cnf = to_config(AppConfig)
+    assert cnf.firebase.private_key == "a_pk"

@@ -32,6 +32,7 @@ class AppConfig:
         type: str = var("service_account")
         project_id: str = var("taller2-fiufit")
         private_key_id: str = var("404e45eb1856c2152c53e2a805e59b0b186ab956")
+        private_key: str = var("https://tenor.com/bhDEJ.gif")
 
     db = group(DB)  # type: ignore
     auth = group(AUTH)  # type: ignore
