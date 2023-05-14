@@ -79,3 +79,15 @@ def test_when_environment_db_create_structures_expect_true():
 def test_when_environment_auth_host_expect_auth_service():
     cnf = to_config(AppConfig)
     assert cnf.auth.host == "auth-service.fiufit.svc.cluster.local:8002"
+
+
+@patch.dict(environ, {}, clear=True)
+def test_when_firebase_type_is_empty_expect_service_account():
+    cnf = to_config(AppConfig)
+    assert cnf.firebase.type == "service_account"
+
+
+@patch.dict(environ, {"TRAININGS_FIREBASE_TYPE": "fiufit"}, clear=True)
+def test_when_firebase_type_has_fiufit_expect_fiufit():
+    cnf = to_config(AppConfig)
+    assert cnf.firebase.type == "fiufit"

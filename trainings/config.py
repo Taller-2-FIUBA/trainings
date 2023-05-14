@@ -27,5 +27,10 @@ class AppConfig:
 
         host = var("auth-service.fiufit.svc.cluster.local:8002")
 
+    @config(prefix="FIREBASE")
+    class Firebase:
+        type: str = var("service_account")
+
     db = group(DB)  # type: ignore
     auth = group(AUTH)  # type: ignore
+    firebase = group(Firebase)
