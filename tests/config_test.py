@@ -165,3 +165,15 @@ def test_when_firebase_auth_uri_is_empty_expect_auth_uri():
 def test_when_firebase_auth_uri_has_auth_com_expect_auth_com():
     cnf = to_config(AppConfig)
     assert cnf.firebase.auth_uri == "auth.com"
+
+
+@patch.dict(environ, {}, clear=True)
+def test_when_firebase_token_uri_is_empty_expect_token_uri():
+    cnf = to_config(AppConfig)
+    assert cnf.firebase.token_uri == "https://oauth2.googleapis.com/token"
+
+
+@patch.dict(environ, {"TRAININGS_FIREBASE_TOKEN_URI": "token.com"}, clear=True)
+def test_when_firebase_token_uri_has_token_com_expect_token_com():
+    cnf = to_config(AppConfig)
+    assert cnf.firebase.token_uri == "token.com"
