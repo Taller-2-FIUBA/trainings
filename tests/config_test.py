@@ -94,7 +94,7 @@ def test_when_firebase_type_has_fiufit_expect_fiufit():
 
 
 @patch.dict(environ, {}, clear=True)
-def test_when_firebase_project_id_is_empty_expect_service_account():
+def test_when_firebase_project_id_is_empty_expect_taller2_fiufit():
     cnf = to_config(AppConfig)
     assert cnf.firebase.project_id == "taller2-fiufit"
 
@@ -106,7 +106,7 @@ def test_when_firebase_project_id_has_an_id_expect_an_id():
 
 
 @patch.dict(environ, {}, clear=True)
-def test_when_firebase_private_key_id_is_empty_expect_service_account():
+def test_when_firebase_private_key_id_is_empty_expect_id():
     cnf = to_config(AppConfig)
     assert cnf.firebase.private_key_id ==\
         "404e45eb1856c2152c53e2a805e59b0b186ab956"
@@ -119,7 +119,7 @@ def test_when_firebase_private_key_id_has_id_expect_id():
 
 
 @patch.dict(environ, {}, clear=True)
-def test_when_firebase_private_key_is_empty_expect_service_account():
+def test_when_firebase_private_key_is_empty_expect_default():
     cnf = to_config(AppConfig)
     assert cnf.firebase.private_key == "https://tenor.com/bhDEJ.gif"
 
@@ -128,3 +128,16 @@ def test_when_firebase_private_key_is_empty_expect_service_account():
 def test_when_firebase_private_key_has_a_pk_expect_a_pk():
     cnf = to_config(AppConfig)
     assert cnf.firebase.private_key == "a_pk"
+
+
+@patch.dict(environ, {}, clear=True)
+def test_when_firebase_client_email_is_empty_expect_main():
+    cnf = to_config(AppConfig)
+    assert cnf.firebase.client_email ==\
+        "firebase-adminsdk-zwduu@taller2-fiufit.iam.gserviceaccount.com"
+
+
+@patch.dict(environ, {"TRAININGS_FIREBASE_CLIENT_EMAIL": "mail"}, clear=True)
+def test_when_firebase_client_email_has_mail_expect_mail():
+    cnf = to_config(AppConfig)
+    assert cnf.firebase.client_email == "mail"
