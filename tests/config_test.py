@@ -103,3 +103,16 @@ def test_when_firebase_project_id_is_empty_expect_service_account():
 def test_when_firebase_project_id_has_an_id_expect_an_id():
     cnf = to_config(AppConfig)
     assert cnf.firebase.project_id == "an_id"
+
+
+@patch.dict(environ, {}, clear=True)
+def test_when_firebase_private_key_id_is_empty_expect_service_account():
+    cnf = to_config(AppConfig)
+    assert cnf.firebase.private_key_id ==\
+        "404e45eb1856c2152c53e2a805e59b0b186ab956"
+
+
+@patch.dict(environ, {"TRAININGS_FIREBASE_PRIVATE_KEY_ID": "id"}, clear=True)
+def test_when_firebase_private_key_id_has_id_expect_id():
+    cnf = to_config(AppConfig)
+    assert cnf.firebase.private_key_id == "id"
