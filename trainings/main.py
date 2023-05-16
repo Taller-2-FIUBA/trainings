@@ -26,7 +26,7 @@ from trainings.trainings.dto import (
     TrainingFilters,
 )
 from trainings.trainings.dao import browse, add, edit, read
-from trainings.trainings.filters import get_columns_and_values
+from trainings.trainings.helper import get_columns_and_values
 from trainings.trainings.hydrator import hydrate as hydrate_dto
 from trainings.training_types.dto import TrainingTypesOut
 from trainings.training_types.dao import browse as browse_types
@@ -170,8 +170,16 @@ async def modify_training(
     try:
         with session as open_session:
             logging.info("Searching for training...")
-            read(open_session, training_id)
+            training = read(open_session, training_id)
+            logging.debug("Building values for query...")
             columns_and_values = get_columns_and_values(body)
+            if "media" in columns_and_values:
+                logging.info("Saving media...")
+                columns_and_values["media"] = save(
+                    columns_and_values["media"],
+                    training.trainer_id,
+                    CONFIGURATION
+                )
             logging.info(
                 "Updating values (%s) of %s.", columns_and_values, training_id
             )
@@ -196,8 +204,13 @@ async def create_training(
     logging.info("Validating permissions. Headers: %s", request.headers)
     permissions = get_permissions(request.headers, Client(), CONFIGURATION)
     assert_can_create_training(permissions)
-    logging.info("Saving media...")
-    training_to_create.media = save(training_to_create.media)
+    if training_to_create.media:
+        logging.info("Saving media...")
+        training_to_create.media = save(
+            training_to_create.media,
+            training_to_create.trainer_id,
+            CONFIGURATION
+        )
     logging.info("Creating training %s", training_to_create.dict())
     m.REQUEST_COUNTER.labels(BASE_URI, "post").inc()
     with session as open_session:

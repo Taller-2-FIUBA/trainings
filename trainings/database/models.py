@@ -15,9 +15,6 @@ class TrainingType(Base):
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name = Column(String)  # cardio, arms, legs, etc.
 
-    def __repr__(self):
-        return f"<TrainingType {self.id, self.name}>"
-
 
 class Difficulty(Base):
     """Table structure for difficulty of trainings."""
@@ -25,9 +22,6 @@ class Difficulty(Base):
     __tablename__ = "difficulty"
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     name = Column(String)  # Easy, Medium or Hard
-
-    def __repr__(self):
-        return f"<Difficulty {self.id, self.name}>"
 
 
 class Exercise(Base):
@@ -41,9 +35,6 @@ class Exercise(Base):
 
     # Relationships
     type: Mapped["TrainingType"] = relationship(lazy="joined")
-
-    def __repr__(self):
-        return f"<Exercise {self.id, self.name}>"
 
 
 class TrainingExercise(Base):
@@ -61,9 +52,6 @@ class TrainingExercise(Base):
         lazy="joined", back_populates="exercises"
     )
     exercise: Mapped["Exercise"] = relationship(lazy="joined")
-
-    def __repr__(self):
-        return f"<TrainingExercise {self.id}>"
 
 
 class Training(Base):
@@ -89,9 +77,6 @@ class Training(Base):
         lazy="joined", back_populates="training"
     )
 
-    def __repr__(self):
-        return f"<Training {self.id, self.tittle}>"
-
 
 class Users(Base):
     """Table structure for user."""
@@ -115,9 +100,6 @@ class Users(Base):
         lazy="joined", back_populates="user"
     )
 
-    def __repr__(self):
-        return f"<Users {self.id} {self.email}>"
-
 
 class UserTraining(Base):
     """Table structure for exercises within a training."""
@@ -135,6 +117,3 @@ class UserTraining(Base):
         lazy="joined", back_populates="trainings"
     )
     training: Mapped["Training"] = relationship(lazy="joined")
-
-    def __repr__(self):
-        return f"<UserTraining {self.user_id} {self.training_id}>"

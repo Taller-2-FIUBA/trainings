@@ -29,6 +29,8 @@ class AppConfig:
 
     @config(prefix="FIREBASE")
     class Firebase:
+        """Firebase configuration."""
+
         type: str = var("service_account")
         project_id: str = var("taller2-fiufit")
         private_key_id: str = var("404e45eb1856c2152c53e2a805e59b0b186ab956")
