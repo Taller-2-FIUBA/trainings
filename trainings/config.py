@@ -27,6 +27,7 @@ class AppConfig:
         """Authentication service configuration."""
 
         host = var("auth-service.fiufit.svc.cluster.local:8002")
+        validate_credentials = bool_var(True)
 
     @config(prefix="FIREBASE")
     class Firebase:

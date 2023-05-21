@@ -100,6 +100,20 @@ def test_when_environment_auth_host_expect_auth_service():
 
 
 @patch.dict(environ, {}, clear=True)
+def test_when_environment_auth_validate_credentials_is_not_set_expect_true():
+    cnf = to_config(AppConfig)
+    assert cnf.auth.validate_credentials
+
+
+@patch.dict(
+    environ, {"TRAININGS_AUTH_VALIDATE_CREDENTIALS": "false"}, clear=True
+)
+def test_when_environment_auth_validate_credentials_is_false_expect_false():
+    cnf = to_config(AppConfig)
+    assert not cnf.auth.validate_credentials
+
+
+@patch.dict(environ, {}, clear=True)
 def test_when_firebase_type_is_empty_expect_service_account():
     cnf = to_config(AppConfig)
     assert cnf.firebase.type == "service_account"
