@@ -65,10 +65,28 @@ def test_when_environment_db_database_expect_fiufit():
     assert cnf.db.database == "fiufit"
 
 
+@patch.dict(environ, {}, clear=True)
+def test_when_environment_db_create_structures_is_not_set_expect_false():
+    cnf = to_config(AppConfig)
+    assert not cnf.db.create_structures
+
+
 @patch.dict(environ, {"TRAININGS_DB_CREATE_STRUCTURES": "True"}, clear=True)
-def test_when_environment_db_create_structures_expect_true():
+def test_when_environment_db_create_structures_is_set_true_expect_true():
     cnf = to_config(AppConfig)
     assert cnf.db.create_structures
+
+
+@patch.dict(environ, {}, clear=True)
+def test_when_environment_db_ssl_is_not_set_expect_true():
+    cnf = to_config(AppConfig)
+    assert cnf.db.ssl
+
+
+@patch.dict(environ, {"TRAININGS_DB_SSL": "false"}, clear=True)
+def test_when_environment_db_ssl_is_set_to_false_expect_false():
+    cnf = to_config(AppConfig)
+    assert not cnf.db.ssl
 
 
 @patch.dict(

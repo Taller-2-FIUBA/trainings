@@ -1,5 +1,5 @@
 """Application configuration."""
-from environ import config, var, group
+from environ import bool_var, config, var, group
 
 
 @config(prefix="TRAININGS")
@@ -19,7 +19,8 @@ class AppConfig:
         host = var("localhost")
         port = var(5432, converter=int)
         database = var("postgres")
-        create_structures = var(False, converter=bool)
+        create_structures = bool_var(False)
+        ssl = bool_var(True)
 
     @config
     class AUTH:
