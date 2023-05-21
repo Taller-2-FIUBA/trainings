@@ -42,7 +42,7 @@ def test_saving_blob_expect_a_firebase_id(
 
 def test_that_file_name_is_random():
     first = get_file_name("some_trainer_id")
-    assert_that(first, matches_regexp("some_trainer_id([A-z0-9]{32})"))
+    assert_that(first, matches_regexp("some_trainer_id-([A-z0-9]{32})"))
     assert first != get_file_name("some_trainer_id")
     assert first != get_file_name("some_trainer_id")
 

@@ -11,7 +11,7 @@ from trainings.config import AppConfig
 
 def get_file_name(trainer_id: str) -> str:
     """Return a file name for the training media."""
-    return trainer_id + ''.join(
+    return trainer_id + "-" + ''.join(
         random.choices(string.ascii_uppercase + string.digits, k=32)
     )
 
