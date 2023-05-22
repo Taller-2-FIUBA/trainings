@@ -2,9 +2,10 @@
 import logging
 import random
 import string
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from firebase_admin import initialize_app, storage, get_app
 from firebase_admin.credentials import Certificate
+from google.cloud.exceptions import NotFound
 
 from trainings.config import AppConfig
 
@@ -33,9 +34,8 @@ def get_certificate(config: AppConfig) -> Dict[str, Any]:
     }
 
 
-def save(media: str, trainer_id: str, config: AppConfig) -> str:
-    """Save media in firebase and return id."""
-    logging.debug("Saving firebase media: %s", media)
+def initialize(config: AppConfig):
+    """Configure firebase."""
     logging.debug("Cheking if firebase is initialized...")
     try:
         app = get_app()
@@ -48,6 +48,14 @@ def save(media: str, trainer_id: str, config: AppConfig) -> str:
             Certificate(get_certificate(config)),
             {"storageBucket": config.firebase.storage_bucket}
         )
+    else:
+        logging.debug("Firebase initialized no need to initialize again.")
+
+
+def save(media: str, trainer_id: str, config: AppConfig) -> str:
+    """Save media in firebase and return id."""
+    initialize(config)
+    logging.debug("Saving firebase media: %s", media)
     bucket = storage.bucket()
     file_name = get_file_name(trainer_id)
     blob = bucket.blob(file_name)
@@ -55,3 +63,17 @@ def save(media: str, trainer_id: str, config: AppConfig) -> str:
     blob.upload_from_string(media)
     logging.info("Saved media in %s.", file_name)
     return file_name
+
+
+def read(name: str, config: AppConfig) -> Optional[str]:
+    """Read file from firebase."""
+    initialize(config)
+    bucket = storage.bucket()
+    blob = bucket.blob(name)
+    logging.info("Downloading media %s...", name)
+    try:
+        media = blob.download_as_text()
+    except NotFound as e:
+        logging.error("Blob of media named %s not found. Error: %s", name, e)
+        media = None
+    return media

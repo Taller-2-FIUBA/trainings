@@ -12,7 +12,6 @@ from trainings.main import EXERCISES_URI, TYPES_URI, app, get_db, BASE_URI
 from trainings.database.models import Base
 
 GET_PERMISSIONS_MOCK = MagicMock(return_value={"a": "b"})
-FIREBASE_SAVE_MOCK = MagicMock(return_value="a_firebase_id")
 
 # Setup
 
@@ -138,13 +137,11 @@ def test_when_filtering_by_trainer_id_banana_returns_no_training():
 
 @patch("trainings.main.get_permissions", GET_PERMISSIONS_MOCK)
 @patch("trainings.main.assert_can_create_training")
-@patch("trainings.main.save", FIREBASE_SAVE_MOCK)
 def test_post_training(assert_can_create_training_mock):
     response = client.post(BASE_URI, json=c.TRAINING_TO_BE_CREATED)
     assert response.status_code == 200
     values_to_override = {
         "rating": 0,
-        "media": "a_firebase_id",
         "blocked": False,
     }
     assert are_equal(
@@ -154,9 +151,6 @@ def test_post_training(assert_can_create_training_mock):
     )
     GET_PERMISSIONS_MOCK.assert_called_once()
     assert_can_create_training_mock.assert_called_once_with({"a": "b"})
-    FIREBASE_SAVE_MOCK.assert_called_once_with(
-        "blobOfMedia", "Ju6JXm1S8rVQf7C18mqL418JdgE2", ANY
-    )
 
 
 def test_when_creating_training_without_tittle_expect_error():
@@ -288,7 +282,7 @@ def test_when_blocking_training_of_id_3_expect_blocked_to_be_true(
     save_mock: MagicMock
 ):
     url = BASE_URI + "/3"
-    ignored_values = {"rating", "media"}
+    ignored_values = {"rating"}
     unblocked_training = c.TO_BLOCK_TRAINING | {"blocked": False}
     blocked_training = c.TO_BLOCK_TRAINING | {"blocked": True}
     # Assert that is not blocked when starting

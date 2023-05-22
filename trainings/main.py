@@ -122,7 +122,7 @@ async def get_trainings(
     dtos = []
     logging.info("Building DTOs...")
     for training in trainings:
-        dtos.append(hydrate_dto(training))
+        dtos.append(hydrate_dto(training, CONFIGURATION))
     response = TrainingsWithPagination(
         items=dtos,
         offset=filters.offset,
@@ -152,7 +152,7 @@ async def get_training(
             detail="Training not found.", status_code=404
         ) from error
     logging.info("Building DTO...")
-    return hydrate_dto(training)
+    return hydrate_dto(training, CONFIGURATION)
 
 
 @app.patch(
@@ -218,7 +218,7 @@ async def create_training(
         created_training = add(
             open_session, hydrate_model(open_session, training_to_create)
         )
-    return hydrate_dto(created_training)
+    return hydrate_dto(created_training, CONFIGURATION)
 
 
 @app.get(TYPES_URI, response_model=TrainingTypesOut)
@@ -307,7 +307,7 @@ async def get_favourite_training_for_user(
     logging.info("Building DTOs...")
     for user_trainings in user.trainings:
         logging.debug("Building DTO of %s...", user_trainings.__dict__)
-        dtos.append(hydrate_dto(user_trainings.training))
+        dtos.append(hydrate_dto(user_trainings.training, CONFIGURATION))
     return TrainingsWithPagination(
         items=dtos,
         offset=offset,

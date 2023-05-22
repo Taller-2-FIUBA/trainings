@@ -45,7 +45,7 @@ def insert_trainings(session: Session) -> None:
             description="This is the first training.",
             type_id=1,
             difficulty_id=1,
-            media="a_firebase_id",
+            media=None,
             blocked=False,
         ),
         Training(
@@ -55,7 +55,7 @@ def insert_trainings(session: Session) -> None:
             description="This is the tomato training.",
             type_id=2,
             difficulty_id=2,
-            media="a_firebase_id",
+            media=None,
             blocked=False,
         ),
         Training(
@@ -65,7 +65,7 @@ def insert_trainings(session: Session) -> None:
             description="This is going to be blocked and unblocked.",
             type_id=3,
             difficulty_id=3,
-            media="a_firebase_id",
+            media=None,
             blocked=False,
         ),
         Training(
@@ -75,7 +75,7 @@ def insert_trainings(session: Session) -> None:
             description="This is going to change.",
             type_id=3,
             difficulty_id=3,
-            media="a_firebase_id",
+            media=None,
             blocked=False,
         ),
     ]
