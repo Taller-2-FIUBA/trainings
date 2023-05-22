@@ -50,7 +50,7 @@ class AppConfig:
             "https://www.googleapis.com/robot/v1/metadata/x509/"
             "firebase-adminsdk-zwduu%40taller2-fiufit.iam.gserviceaccount.com"
         )
-        storagebucket: str = var("taller2-fiufit.appspot.com")
+        storage_bucket: str = var("taller2-fiufit.appspot.com")
 
     db = group(DB)  # type: ignore
     auth = group(AUTH)  # type: ignore
