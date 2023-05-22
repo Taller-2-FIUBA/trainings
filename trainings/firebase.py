@@ -3,7 +3,7 @@ import logging
 import random
 import string
 from typing import Any, Dict
-from firebase_admin import initialize_app, storage
+from firebase_admin import initialize_app, storage, get_app
 from firebase_admin.credentials import Certificate
 
 from trainings.config import AppConfig
@@ -35,12 +35,14 @@ def get_certificate(config: AppConfig) -> Dict[str, Any]:
 
 def save(media: str, trainer_id: str, config: AppConfig) -> str:
     """Save media in firebase and return id."""
-    logging.debug("Saving in firebase: %s", media)
-    logging.info("Initializing firebase...")
-    initialize_app(
-        Certificate(get_certificate(config)),
-        {"storageBucket": config.firebase.storagebucket}
-    )
+    logging.debug("Saving firebase media: %s", media)
+    logging.debug("Cheking if firebase is initialized...")
+    if not get_app():
+        logging.info("Initializing firebase...")
+        initialize_app(
+            Certificate(get_certificate(config)),
+            {"storageBucket": config.firebase.storage_bucket}
+        )
     bucket = storage.bucket()
     file_name = get_file_name(trainer_id)
     blob = bucket.blob(file_name)
