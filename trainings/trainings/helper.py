@@ -7,7 +7,6 @@ from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.orm import Session
 
 from trainings.database.models import Difficulty, Training, TrainingType
-from trainings.firebase import save
 from trainings.trainings.dto import TrainingFilters, TrainingPatch
 
 
@@ -49,7 +48,4 @@ def get_columns_and_values(patch_values: TrainingPatch) -> Dict[str, Any]:
     columns_and_values = {
         k: v for k, v in patch_values.dict().items() if v is not None
     }
-    if "media" in columns_and_values:
-        logging.info("Saving media...")
-        columns_and_values["media"] = save(patch_values.media)
     return columns_and_values

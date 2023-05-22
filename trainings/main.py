@@ -26,7 +26,7 @@ from trainings.trainings.dto import (
     TrainingFilters,
 )
 from trainings.trainings.dao import browse, add, edit, read
-from trainings.trainings.filters import get_columns_and_values
+from trainings.trainings.helper import get_columns_and_values
 from trainings.trainings.hydrator import hydrate as hydrate_dto
 from trainings.training_types.dto import TrainingTypesOut
 from trainings.training_types.dao import browse as browse_types
@@ -79,7 +79,7 @@ logging.basicConfig(encoding="utf-8", level=CONFIGURATION.log_level.upper())
 
 ENGINE = create_engine(
     get_database_url(CONFIGURATION),
-    connect_args={"sslmode": "require"},
+    connect_args={"sslmode": "require" if CONFIGURATION.db.ssl else "disable"},
 )
 
 
@@ -122,7 +122,7 @@ async def get_trainings(
     dtos = []
     logging.info("Building DTOs...")
     for training in trainings:
-        dtos.append(hydrate_dto(training))
+        dtos.append(hydrate_dto(training, CONFIGURATION))
     response = TrainingsWithPagination(
         items=dtos,
         offset=filters.offset,
@@ -152,7 +152,7 @@ async def get_training(
             detail="Training not found.", status_code=404
         ) from error
     logging.info("Building DTO...")
-    return hydrate_dto(training)
+    return hydrate_dto(training, CONFIGURATION)
 
 
 @app.patch(
@@ -170,8 +170,16 @@ async def modify_training(
     try:
         with session as open_session:
             logging.info("Searching for training...")
-            read(open_session, training_id)
+            training = read(open_session, training_id)
+            logging.debug("Building values for query...")
             columns_and_values = get_columns_and_values(body)
+            if "media" in columns_and_values:
+                logging.info("Saving media...")
+                columns_and_values["media"] = save(
+                    columns_and_values["media"],
+                    training.trainer_id,
+                    CONFIGURATION
+                )
             logging.info(
                 "Updating values (%s) of %s.", columns_and_values, training_id
             )
@@ -193,18 +201,24 @@ async def create_training(
     session: Session = Depends(get_db)
 ) -> TrainingOut:
     """Create a training."""
-    logging.info("Validating permissions. Headers: %s", request.headers)
-    permissions = get_permissions(request.headers, Client(), CONFIGURATION)
-    assert_can_create_training(permissions)
-    logging.info("Saving media...")
-    training_to_create.media = save(training_to_create.media)
+    if CONFIGURATION.auth.validate_credentials:
+        logging.info("Validating permissions. Headers: %s", request.headers)
+        permissions = get_permissions(request.headers, Client(), CONFIGURATION)
+        assert_can_create_training(permissions)
+    if training_to_create.media:
+        logging.info("Saving media...")
+        training_to_create.media = save(
+            training_to_create.media,
+            training_to_create.trainer_id,
+            CONFIGURATION
+        )
     logging.info("Creating training %s", training_to_create.dict())
     m.REQUEST_COUNTER.labels(BASE_URI, "post").inc()
     with session as open_session:
         created_training = add(
             open_session, hydrate_model(open_session, training_to_create)
         )
-    return hydrate_dto(created_training)
+    return hydrate_dto(created_training, CONFIGURATION)
 
 
 @app.get(TYPES_URI, response_model=TrainingTypesOut)
@@ -293,7 +307,7 @@ async def get_favourite_training_for_user(
     logging.info("Building DTOs...")
     for user_trainings in user.trainings:
         logging.debug("Building DTO of %s...", user_trainings.__dict__)
-        dtos.append(hydrate_dto(user_trainings.training))
+        dtos.append(hydrate_dto(user_trainings.training, CONFIGURATION))
     return TrainingsWithPagination(
         items=dtos,
         offset=offset,

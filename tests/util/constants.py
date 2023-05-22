@@ -7,7 +7,6 @@ FIRST_TRAINING = {
     "description": "This is the first training.",
     "type": "Cardio",
     "difficulty": "Easy",
-    "media": "a_firebase_id",
     "rating": 0,
     "blocked": False,
     "exercises": [
@@ -41,7 +40,6 @@ TOMATO_TRAINING = {
     "description": "This is the tomato training.",
     "type": "Leg",
     "difficulty": "Medium",
-    "media": "a_firebase_id",
     "rating": 0,
     "blocked": False,
     "exercises": [
@@ -61,7 +59,6 @@ TO_BLOCK_TRAINING = {
     "description": "This is going to be blocked and unblocked.",
     "type": "Arm",
     "difficulty": "Hard",
-    "media": "a_firebase_id",
     "rating": 0,
     "blocked": False,
     "exercises": [
@@ -81,7 +78,6 @@ TO_EDIT_TRAINING = {
     "description": "This is going to change.",
     "type": "Arm",
     "difficulty": "Hard",
-    "media": "a_firebase_id",
     "rating": 0,
     "blocked": False,
     "exercises": [
@@ -107,7 +103,6 @@ TRAINING_TO_BE_CREATED = {
     "description": "A training created with POST.",
     "type": "Arm",
     "difficulty": "Medium",
-    "media": "blobOfMedia",
     "exercises": [
         {
             "name": "Hammer curl",

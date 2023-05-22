@@ -1,5 +1,5 @@
 # pylint: disable= missing-module-docstring, missing-function-docstring
-from unittest.mock import MagicMock, patch
+from unittest.mock import ANY, MagicMock, patch
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
@@ -12,7 +12,6 @@ from trainings.main import EXERCISES_URI, TYPES_URI, app, get_db, BASE_URI
 from trainings.database.models import Base
 
 GET_PERMISSIONS_MOCK = MagicMock(return_value={"a": "b"})
-FIREBASE_SAVE_MOCK = MagicMock(return_value="a_firebase_id")
 
 # Setup
 
@@ -138,13 +137,11 @@ def test_when_filtering_by_trainer_id_banana_returns_no_training():
 
 @patch("trainings.main.get_permissions", GET_PERMISSIONS_MOCK)
 @patch("trainings.main.assert_can_create_training")
-@patch("trainings.main.save", FIREBASE_SAVE_MOCK)
 def test_post_training(assert_can_create_training_mock):
     response = client.post(BASE_URI, json=c.TRAINING_TO_BE_CREATED)
     assert response.status_code == 200
     values_to_override = {
         "rating": 0,
-        "media": "a_firebase_id",
         "blocked": False,
     }
     assert are_equal(
@@ -154,7 +151,6 @@ def test_post_training(assert_can_create_training_mock):
     )
     GET_PERMISSIONS_MOCK.assert_called_once()
     assert_can_create_training_mock.assert_called_once_with({"a": "b"})
-    FIREBASE_SAVE_MOCK.assert_called_once_with("blobOfMedia")
 
 
 def test_when_creating_training_without_tittle_expect_error():
@@ -281,9 +277,12 @@ def test_when_getting_exercises_expect_list():
     assert are_equal(response.json(), c.EXPECTED_EXERCISES, {})
 
 
-def test_when_blocking_training_of_id_3_expect_blocked_to_be_true():
+@patch("trainings.main.save")
+def test_when_blocking_training_of_id_3_expect_blocked_to_be_true(
+    save_mock: MagicMock
+):
     url = BASE_URI + "/3"
-    ignored_values = {"rating", "media"}
+    ignored_values = {"rating"}
     unblocked_training = c.TO_BLOCK_TRAINING | {"blocked": False}
     blocked_training = c.TO_BLOCK_TRAINING | {"blocked": True}
     # Assert that is not blocked when starting
@@ -293,6 +292,7 @@ def test_when_blocking_training_of_id_3_expect_blocked_to_be_true():
     # Block it
     response = client.patch(url, json={"blocked": True})
     assert response.status_code == 204, response.json()
+    save_mock.assert_not_called()
     # Assert it is blocked
     response = client.get(url)
     assert response.status_code == 201
@@ -300,13 +300,17 @@ def test_when_blocking_training_of_id_3_expect_blocked_to_be_true():
     # Unblock it
     response = client.patch(url, json={"blocked": False})
     assert response.status_code == 204, response.json()
+    save_mock.assert_not_called()
     # Assert it is unblocked
     response = client.get(url)
     assert response.status_code == 201
     assert are_equal(response.json(), unblocked_training, ignored_values)
 
 
-def test_when_editing_training_4_tittle_expect_new_tittle():
+@patch("trainings.main.save")
+def test_when_editing_training_4_tittle_expect_new_tittle(
+    save_mock: MagicMock
+):
     url = BASE_URI + "/4"
     original_tittle = "This training will be modified, trainer is indecisive."
     edited_tittle = {"tittle": "Trainer has decided."}
@@ -317,13 +321,17 @@ def test_when_editing_training_4_tittle_expect_new_tittle():
     # Edit it
     response = client.patch(url, json=edited_tittle)
     assert response.status_code == 204, response.json()
+    save_mock.assert_not_called()
     # Assert it has new tittle
     response = client.get(url)
     assert response.status_code == 201
     assert response.json()["tittle"] == "Trainer has decided."
 
 
-def test_when_editing_training_4_description_expect_new_description():
+@patch("trainings.main.save")
+def test_when_editing_training_4_description_expect_new_description(
+    save_mock: MagicMock
+):
     url = BASE_URI + "/4"
     edited_description = {"description": "This will never change."}
     # Assert original training
@@ -333,17 +341,22 @@ def test_when_editing_training_4_description_expect_new_description():
     # Edit it
     response = client.patch(url, json=edited_description)
     assert response.status_code == 204, response.json()
+    save_mock.assert_not_called()
     # Assert it has new description
     response = client.get(url)
     assert response.status_code == 201
     assert response.json()["description"] == "This will never change."
 
 
-def test_when_editing_training_4_media_expect_new_media():
+@patch("trainings.main.save", return_value="filename")
+def test_when_editing_training_4_media_expect_new_media(
+    save_mock: MagicMock
+):
     url = BASE_URI + "/4"
     edited_media = {"media": "MyNewMedia"}
     response = client.patch(url, json=edited_media)
     assert response.status_code == 204, response.json()
+    save_mock.assert_called_once_with("MyNewMedia", "indecisive_trainer", ANY)
 
 
 def test_when_blocking_training_of_id_9999_expect_error():

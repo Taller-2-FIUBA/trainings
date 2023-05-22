@@ -5,7 +5,7 @@ from typing import Any, Dict
 from sqlalchemy.orm import Session
 from trainings.database.models import Training
 from trainings.trainings.dto import TrainingFilters
-from trainings.trainings.filters import get_criteria
+from trainings.trainings.helper import get_criteria
 
 
 def browse(session: Session, filters: TrainingFilters):
