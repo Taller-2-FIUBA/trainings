@@ -11,7 +11,7 @@ from trainings.firebase import get_certificate, get_file_name, save
 @patch("trainings.firebase.storage.bucket")
 @patch("trainings.firebase.Certificate", return_value=sentinel)
 @patch("trainings.firebase.get_file_name", return_value="filename")
-@patch("trainings.firebase.get_app", return_value=None)
+@patch("trainings.firebase.get_app", side_effect=ValueError)
 def test_saving_blob_expect_a_firebase_id(
     get_app_spy: MagicMock,
     get_file_name_stub: MagicMock,

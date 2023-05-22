@@ -37,7 +37,12 @@ def save(media: str, trainer_id: str, config: AppConfig) -> str:
     """Save media in firebase and return id."""
     logging.debug("Saving firebase media: %s", media)
     logging.debug("Cheking if firebase is initialized...")
-    if not get_app():
+    try:
+        app = get_app()
+    except ValueError as e:
+        logging.info("Firebase is not initialized %s", e)
+        app = None
+    if not app:
         logging.info("Initializing firebase...")
         initialize_app(
             Certificate(get_certificate(config)),
