@@ -13,7 +13,7 @@ def test_when_hydrating_training_with_media_expect_read_call(
         "media": "firebase_file_name",
         "id": 1,
         "trainer_id": 1,
-        "tittle": "A",
+        "title": "A",
         "description": "B",
         "difficulty.name": "C",
         "type.name": "D",
@@ -24,7 +24,7 @@ def test_when_hydrating_training_with_media_expect_read_call(
     assert training_out.media == "blob"
     assert training_out.id == 1
     assert training_out.trainer_id == "1"
-    assert training_out.tittle == "A"
+    assert training_out.title == "A"
     assert training_out.description == "B"
     assert training_out.difficulty == "C"
     assert training_out.type == "D"
@@ -43,7 +43,7 @@ def test_when_hydrating_training_without_media_expect_no_read_call(
         "media": None,
         "id": 1,
         "trainer_id": 1,
-        "tittle": "A",
+        "title": "A",
         "description": "B",
         "difficulty.name": "C",
         "type.name": "D",
@@ -54,7 +54,7 @@ def test_when_hydrating_training_without_media_expect_no_read_call(
     assert training_out.media is None
     assert training_out.id == 1
     assert training_out.trainer_id == "1"
-    assert training_out.tittle == "A"
+    assert training_out.title == "A"
     assert training_out.description == "B"
     assert training_out.difficulty == "C"
     assert training_out.type == "D"

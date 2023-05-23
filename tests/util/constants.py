@@ -3,7 +3,7 @@
 FIRST_TRAINING = {
     "id": 1,
     "trainer_id": "Ju6JXm1S8rVQfyC18mqL418JdgE2",
-    "tittle": "The first training.",
+    "title": "The first training.",
     "description": "This is the first training.",
     "type": "Cardio",
     "difficulty": "Easy",
@@ -36,7 +36,7 @@ FIRST_TRAINING = {
 TOMATO_TRAINING = {
     "id": 2,
     "trainer_id": "tomato",
-    "tittle": "The tomato training.",
+    "title": "The tomato training.",
     "description": "This is the tomato training.",
     "type": "Leg",
     "difficulty": "Medium",
@@ -55,7 +55,7 @@ TOMATO_TRAINING = {
 TO_BLOCK_TRAINING = {
     "id": 3,
     "trainer_id": "naughty_trainer",
-    "tittle": "The training to be blocked.",
+    "title": "The training to be blocked.",
     "description": "This is going to be blocked and unblocked.",
     "type": "Arm",
     "difficulty": "Hard",
@@ -74,7 +74,7 @@ TO_BLOCK_TRAINING = {
 TO_EDIT_TRAINING = {
     "id": 4,
     "trainer_id": "indecisive_trainer",
-    "tittle": "This training will be modified, trainer is indecisive.",
+    "title": "This training will be modified, trainer is indecisive.",
     "description": "This is going to change.",
     "type": "Arm",
     "difficulty": "Hard",
@@ -99,7 +99,7 @@ EMPTY_RESPONSE_WITH_PAGINATION = {
 
 TRAINING_TO_BE_CREATED = {
     "trainer_id": "Ju6JXm1S8rVQf7C18mqL418JdgE2",
-    "tittle": "A training created with POST.",
+    "title": "A training created with POST.",
     "description": "A training created with POST.",
     "type": "Arm",
     "difficulty": "Medium",

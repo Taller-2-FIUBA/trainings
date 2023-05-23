@@ -8,8 +8,8 @@ def test_when_patch_has_all_none_expect_empty_dictionary():
 
 
 def test_when_patch_has_title_expect_title_in_dictionary():
-    columns = get_columns_and_values(TrainingPatch(tittle="training"))
-    assert columns == {"tittle": "training"}
+    columns = get_columns_and_values(TrainingPatch(title="training"))
+    assert columns == {"title": "training"}
 
 
 def test_when_patch_has_description_expect_description_in_dictionary():

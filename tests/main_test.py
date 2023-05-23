@@ -135,6 +135,16 @@ def test_when_filtering_by_trainer_id_banana_returns_no_training():
     assert are_equal(response.json(), c.EMPTY_RESPONSE_WITH_PAGINATION, {})
 
 
+def test_when_filtering_by_title_the_tomato_returns_tomato_training():
+    response = client.get(BASE_URI, params={"title": "The tomato"})
+    assert response.status_code == 200
+    assert are_equal(
+        response.json(),
+        c.EMPTY_RESPONSE_WITH_PAGINATION | {"items": [c.TOMATO_TRAINING]},
+        {},
+    )
+
+
 @patch("trainings.main.get_permissions", GET_PERMISSIONS_MOCK)
 @patch("trainings.main.assert_can_create_training")
 def test_post_training(assert_can_create_training_mock):
@@ -153,9 +163,9 @@ def test_post_training(assert_can_create_training_mock):
     assert_can_create_training_mock.assert_called_once_with({"a": "b"})
 
 
-def test_when_creating_training_without_tittle_expect_error():
+def test_when_creating_training_without_title_expect_error():
     response = client.post(
-        BASE_URI, json=c.TRAINING_TO_BE_CREATED | {"tittle": None}
+        BASE_URI, json=c.TRAINING_TO_BE_CREATED | {"title": None}
     )
     assert response.status_code == 422
     expected_error = {
@@ -163,7 +173,7 @@ def test_when_creating_training_without_tittle_expect_error():
             {
                 "loc": [
                     "body",
-                    "tittle"
+                    "title"
                 ],
                 "msg": "none is not an allowed value",
                 "type": "type_error.none.not_allowed"
@@ -308,24 +318,24 @@ def test_when_blocking_training_of_id_3_expect_blocked_to_be_true(
 
 
 @patch("trainings.main.save")
-def test_when_editing_training_4_tittle_expect_new_tittle(
+def test_when_editing_training_4_title_expect_new_title(
     save_mock: MagicMock
 ):
     url = BASE_URI + "/4"
-    original_tittle = "This training will be modified, trainer is indecisive."
-    edited_tittle = {"tittle": "Trainer has decided."}
+    original_title = "This training will be modified, trainer is indecisive."
+    edited_title = {"title": "Trainer has decided."}
     # Assert original training
     response = client.get(url)
     assert response.status_code == 201
-    assert response.json()["tittle"] == original_tittle
+    assert response.json()["title"] == original_title
     # Edit it
-    response = client.patch(url, json=edited_tittle)
+    response = client.patch(url, json=edited_title)
     assert response.status_code == 204, response.json()
     save_mock.assert_not_called()
-    # Assert it has new tittle
+    # Assert it has new title
     response = client.get(url)
     assert response.status_code == 201
-    assert response.json()["tittle"] == "Trainer has decided."
+    assert response.json()["title"] == "Trainer has decided."
 
 
 @patch("trainings.main.save")

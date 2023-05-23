@@ -18,7 +18,7 @@ class TrainingIn(BaseModel):
     """Training DTO."""
 
     trainer_id: str
-    tittle: str
+    title: str
     description: str
     type: str
     difficulty: str
@@ -51,12 +51,13 @@ class TrainingFilters(BaseModel):
     trainer_id: Optional[str]
     type: Optional[str]
     difficulty: Optional[str]
+    title: Optional[str]
 
 
 class TrainingPatch(BaseModel):
     """Fields from training that can be updated."""
 
-    tittle: Optional[str]
+    title: Optional[str]
     description: Optional[str]
     difficulty: Optional[str]
     media: Optional[str]
