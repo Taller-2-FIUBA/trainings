@@ -135,6 +135,16 @@ def test_when_filtering_by_trainer_id_banana_returns_no_training():
     assert are_equal(response.json(), c.EMPTY_RESPONSE_WITH_PAGINATION, {})
 
 
+def test_when_filtering_by_title_the_tomato_returns_tomato_training():
+    response = client.get(BASE_URI, params={"title": "The tomato"})
+    assert response.status_code == 200
+    assert are_equal(
+        response.json(),
+        c.EMPTY_RESPONSE_WITH_PAGINATION | {"items": [c.TOMATO_TRAINING]},
+        {},
+    )
+
+
 @patch("trainings.main.get_permissions", GET_PERMISSIONS_MOCK)
 @patch("trainings.main.assert_can_create_training")
 def test_post_training(assert_can_create_training_mock):

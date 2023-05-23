@@ -103,6 +103,7 @@ async def get_trainings(
     trainer_id: str | None = None,
     training_type: str | None = None,
     difficulty: str | None = None,
+    title: str | None = None,
     offset: int = 0,
     limit: int = 10,
     session: Session = Depends(get_db)
@@ -113,6 +114,7 @@ async def get_trainings(
         trainer_id=trainer_id,
         type=training_type,
         difficulty=difficulty,
+        title=title,
         offset=offset,
         limit=limit,
     )

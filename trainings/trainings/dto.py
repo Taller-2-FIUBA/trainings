@@ -51,6 +51,7 @@ class TrainingFilters(BaseModel):
     trainer_id: Optional[str]
     type: Optional[str]
     difficulty: Optional[str]
+    title: Optional[str]
 
 
 class TrainingPatch(BaseModel):
