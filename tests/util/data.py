@@ -41,7 +41,7 @@ def insert_trainings(session: Session) -> None:
         Training(
             id=1,
             trainer_id="Ju6JXm1S8rVQfyC18mqL418JdgE2",
-            tittle="The first training.",
+            title="The first training.",
             description="This is the first training.",
             type_id=1,
             difficulty_id=1,
@@ -51,7 +51,7 @@ def insert_trainings(session: Session) -> None:
         Training(
             id=2,
             trainer_id="tomato",
-            tittle="The tomato training.",
+            title="The tomato training.",
             description="This is the tomato training.",
             type_id=2,
             difficulty_id=2,
@@ -61,7 +61,7 @@ def insert_trainings(session: Session) -> None:
         Training(
             id=3,
             trainer_id="naughty_trainer",
-            tittle="The training to be blocked.",
+            title="The training to be blocked.",
             description="This is going to be blocked and unblocked.",
             type_id=3,
             difficulty_id=3,
@@ -71,7 +71,7 @@ def insert_trainings(session: Session) -> None:
         Training(
             id=4,
             trainer_id="indecisive_trainer",
-            tittle="This training will be modified, trainer is indecisive.",
+            title="This training will be modified, trainer is indecisive.",
             description="This is going to change.",
             type_id=3,
             difficulty_id=3,

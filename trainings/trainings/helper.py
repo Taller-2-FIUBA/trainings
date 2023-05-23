@@ -17,7 +17,7 @@ def get_criteria(session: Session, filters: TrainingFilters) -> List:
     if filters.trainer_id:
         criteria.append(Training.trainer_id == filters.trainer_id)
     if filters.title:
-        criteria.append(Training.tittle.like(filters.title + "%"))
+        criteria.append(Training.title.like(filters.title + "%"))
     if filters.type:
         try:
             criteria.append(

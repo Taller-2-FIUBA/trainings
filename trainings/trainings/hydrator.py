@@ -15,7 +15,7 @@ def hydrate(training: Training, config: AppConfig) -> TrainingOut:
     dto = TrainingOut(
         id=int(training.id),
         trainer_id=str(training.trainer_id),
-        tittle=str(training.tittle),
+        title=str(training.title),
         description=str(training.description),
         difficulty=str(training.difficulty.name),
         type=str(training.type.name),
