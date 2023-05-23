@@ -15,9 +15,13 @@ def get_permissions(
 ) -> Dict[str, str]:
     """Get user details from token in request header."""
     url = f"http://{config.auth.host}/auth/credentials"
-    credentials = http_client.get(
-        url, headers={"Authorization": headers.get("Authorization")}
-    )
+    auth_header = headers.get("Authorization")
+    if not auth_header:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Authorization header MUST BE send."
+        )
+    credentials = http_client.get(url, headers={"Authorization": auth_header})
     if credentials.status_code != status.HTTP_200_OK:
         logging.error(
             "Error getting token. Status code: %d, Error: %s",

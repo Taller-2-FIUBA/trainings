@@ -34,6 +34,14 @@ def test_when_external_auth_service_returns_credentials_expect_them():
     )
 
 
+def test_when_authorization_header_is_empty_expect_error():
+    # Setup testing doubles
+    headers = MagicMock(**{"get.return_value": None})
+    # Exercise
+    with raises(HTTPException):
+        get_permissions(headers, MagicMock(), MagicMock())
+
+
 def test_when_external_auth_service_returns_code_403_expect_error():
     response = MagicMock()
     response.status_code = 403
