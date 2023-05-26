@@ -263,6 +263,71 @@ def test_when_creating_training_without_type_expect_error():
     assert response.json() == expected_error
 
 
+@patch("trainings.main.get_permissions", GET_PERMISSIONS_MOCK)
+@patch("trainings.main.assert_can_create_training", MagicMock())
+def test_when_creating_training_with_exercise_name_jump_expect_error():
+    unknown_exercise_name = {
+        "name": "Jump",
+        "type": "Cardio",
+        "count": 15,
+        "series": 3
+    }
+    response = client.post(
+        BASE_URI,
+        json=c.TRAINING_TO_BE_CREATED | {"exercises": [unknown_exercise_name]}
+    )
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": "Could not save training. Exercise Jump None not found."
+    }
+
+
+@patch("trainings.main.get_permissions", GET_PERMISSIONS_MOCK)
+@patch("trainings.main.assert_can_create_training", MagicMock())
+def test_when_creating_training_with_exercise_unit_watt_expect_error():
+    unknown_exercise_unit = {
+        "name": "Run",
+        "unit": "watt",
+        "type": "Cardio",
+        "count": 1,
+        "series": 1,
+    }
+    response = client.post(
+        BASE_URI,
+        json=c.TRAINING_TO_BE_CREATED | {"exercises": [unknown_exercise_unit]}
+    )
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": "Could not save training. Exercise Run watt not found."
+    }
+
+
+@patch("trainings.main.get_permissions", GET_PERMISSIONS_MOCK)
+@patch("trainings.main.assert_can_create_training", MagicMock())
+def test_when_creating_training_with_type_awesome_expect_error():
+    response = client.post(
+        BASE_URI,
+        json=c.TRAINING_TO_BE_CREATED | {"type": "awesome"}
+    )
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": "Could not save training. Type awesome not found."
+    }
+
+
+@patch("trainings.main.get_permissions", GET_PERMISSIONS_MOCK)
+@patch("trainings.main.assert_can_create_training", MagicMock())
+def test_when_creating_training_with_difficulty_fair_expect_error():
+    response = client.post(
+        BASE_URI,
+        json=c.TRAINING_TO_BE_CREATED | {"difficulty": "fair"}
+    )
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": "Could not save training. Difficulty fair not found."
+    }
+
+
 def test_get_training_by_id():
     response = client.get(BASE_URI + "/1")
     assert response.status_code == 201
