@@ -52,6 +52,14 @@ class AppConfig:
         )
         storage_bucket: str = var("taller2-fiufit.appspot.com")
 
+    @config(prefix="SENTRY")
+    class Sentry:
+        """Sentry configuration."""
+
+        enabled = bool_var(False)
+        dsn = var("https://token@sentry.ingest.localhost")
+
     db = group(DB)  # type: ignore
     auth = group(AUTH)  # type: ignore
     firebase = group(Firebase)
+    sentry = group(Sentry)
