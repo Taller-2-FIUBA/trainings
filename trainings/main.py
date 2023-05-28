@@ -1,6 +1,7 @@
 """Requests handlers."""
 import logging
 
+import sentry_sdk
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.applications import get_swagger_ui_html
@@ -47,6 +48,9 @@ TYPES_URI = BASE_URI + "/types/"
 EXERCISES_URI = BASE_URI + "/exercises/"
 USER_TRAININGS_URI = "/users/{user_id}/trainings"
 CONFIGURATION = to_config(AppConfig)
+
+if CONFIGURATION.sentry.enabled:
+    sentry_sdk.init(dsn=CONFIGURATION.sentry.dsn, traces_sample_rate=0.5)
 
 app = FastAPI(debug=CONFIGURATION.log_level.upper() == "DEBUG")
 METHODS = [
