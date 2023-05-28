@@ -73,9 +73,6 @@ class Training(Base):
     exercises: Mapped[List["TrainingExercise"]] = relationship(
         lazy="joined", back_populates="training"
     )
-    user: Mapped["UserTraining"] = relationship(
-        lazy="joined", back_populates="training"
-    )
 
 
 class Users(Base):
@@ -96,9 +93,7 @@ class Users(Base):
     is_blocked = Column(Boolean)
 
     # Relationships
-    trainings: Mapped[List["UserTraining"]] = relationship(
-        lazy="joined", back_populates="user"
-    )
+    trainings: Mapped[List["UserTraining"]] = relationship(lazy="joined")
 
 
 class UserTraining(Base):
@@ -117,3 +112,16 @@ class UserTraining(Base):
         lazy="joined", back_populates="trainings"
     )
     training: Mapped["Training"] = relationship(lazy="joined")
+
+
+class UserRatesTraining(Base):
+    """Table structure for user ratings of a training."""
+
+    __tablename__ = "user_rates_training"
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id"), primary_key=True
+    )
+    training_id: Mapped[int] = mapped_column(
+        ForeignKey("training.id"), primary_key=True
+    )
+    ratting = Column(Float)

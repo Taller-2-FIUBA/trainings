@@ -2,14 +2,13 @@
 import logging
 
 import sentry_sdk
-from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.applications import get_swagger_ui_html
 from environ import to_config
 from prometheus_client import start_http_server
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from sqlalchemy.orm.exc import NoResultFound
 from httpx import Client
 
 import trainings.metrics as m
@@ -19,6 +18,10 @@ from trainings.database.url import get_database_url
 from trainings.database.models import Base
 from trainings.database.hydrator import hydrate as hydrate_model
 from trainings.database.data import init_db
+from trainings.request.helper import (
+    read_training,
+    read_user,
+)
 from trainings.trainings.dto import (
     TrainingIn,
     TrainingOut,
@@ -26,7 +29,7 @@ from trainings.trainings.dto import (
     TrainingsWithPagination,
     TrainingFilters,
 )
-from trainings.trainings.dao import browse, add, edit, read
+from trainings.trainings.dao import browse, add, edit
 from trainings.trainings.helper import get_columns_and_values
 from trainings.trainings.hydrator import hydrate as hydrate_dto
 from trainings.training_types.dto import TrainingTypesOut
@@ -37,16 +40,18 @@ from trainings.exercises.dao import browse as browse_exercises
 from trainings.exercises.hydrator import hydrate as hydrate_exercises
 from trainings.firebase import save
 from trainings.user_trainings.dto import UserTrainingIn
-from trainings.users.dao import read as read_user
 from trainings.user_trainings.dao import (
     add as add_user_training,
     browse as browse_user_trainings
 )
+from trainings.rating.dto import TrainingRatingIn
+from trainings.rating.dao import add as add_rating
 
 BASE_URI = "/trainings"
 TYPES_URI = BASE_URI + "/types/"
 EXERCISES_URI = BASE_URI + "/exercises/"
 USER_TRAININGS_URI = "/users/{user_id}/trainings"
+TRAINING_ID = "/{training_id}"
 CONFIGURATION = to_config(AppConfig)
 
 if CONFIGURATION.sentry.enabled:
@@ -149,14 +154,8 @@ async def get_training(
 ) -> TrainingsWithPagination:
     """Get one training."""
     m.REQUEST_COUNTER.labels(BASE_URI, "get").inc()
-    logging.info("Searching for training %d...", training_id)
-    try:
-        with session as open_session:
-            training = read(open_session, training_id)
-    except NoResultFound as error:
-        raise HTTPException(
-            detail="Training not found.", status_code=404
-        ) from error
+    with session as open_session:
+        training = read_training(open_session, training_id)
     logging.info("Building DTO...")
     return hydrate_dto(training, CONFIGURATION)
 
@@ -173,27 +172,22 @@ async def modify_training(
     """Modify one training."""
     m.REQUEST_COUNTER.labels(BASE_URI, "patch").inc()
     logging.info("Received values (%s) to update.", body.dict())
-    try:
-        with session as open_session:
-            logging.info("Searching for training...")
-            training = read(open_session, training_id)
-            logging.debug("Building values for query...")
-            columns_and_values = get_columns_and_values(body)
-            if "media" in columns_and_values:
-                logging.info("Saving media...")
-                columns_and_values["media"] = save(
-                    columns_and_values["media"],
-                    training.trainer_id,
-                    CONFIGURATION
-                )
-            logging.info(
-                "Updating values (%s) of %s.", columns_and_values, training_id
+    with session as open_session:
+        logging.info("Searching for training...")
+        training = read_training(open_session, training_id)
+        logging.debug("Building values for query...")
+        columns_and_values = get_columns_and_values(body)
+        if "media" in columns_and_values:
+            logging.info("Saving media...")
+            columns_and_values["media"] = save(
+                columns_and_values["media"],
+                training.trainer_id,
+                CONFIGURATION
             )
-            edit(open_session, training_id, columns_and_values)
-    except NoResultFound as error:
-        raise HTTPException(
-            detail="Training not found.", status_code=404
-        ) from error
+        logging.info(
+            "Updating values (%s) of %s.", columns_and_values, training_id
+        )
+        edit(open_session, training_id, columns_and_values)
 
 
 @app.post(
@@ -267,23 +261,27 @@ async def save_training_for_user(
     )
     m.REQUEST_COUNTER.labels(USER_TRAININGS_URI, "post").inc()
     with session as open_session:
-        try:
-            logging.info(
-                "Searching for trainingId=%d...", training.training_id
-            )
-            read(open_session, training.training_id)
-        except NoResultFound as error:
-            raise HTTPException(
-                detail="Training not found.", status_code=404
-            ) from error
-        try:
-            logging.info("Searching for userId=%s...", user_id)
-            read_user(open_session, user_id)
-        except NoResultFound as error:
-            raise HTTPException(
-                detail="User not found.", status_code=404
-            ) from error
+        read_training(open_session, training.training_id)
+        read_user(open_session, user_id)
         add_user_training(open_session, user_id, training.training_id)
+
+
+@app.put(USER_TRAININGS_URI + TRAINING_ID, status_code=204)
+async def rate_training(
+    user_id: str,
+    training_id: str,
+    rating: TrainingRatingIn,
+    session: Session = Depends(get_db),
+) -> None:
+    """Rate a training."""
+    logging.info(
+        "User %d rates training %d with %d", user_id, training_id, rating.rate
+    )
+    m.REQUEST_COUNTER.labels(USER_TRAININGS_URI + TRAINING_ID, "put").inc()
+    with session as open_session:
+        read_user(open_session, user_id)
+        read_training(open_session, training_id)
+        add_rating(open_session, user_id, training_id, rating.rate)
 
 
 @app.get(
@@ -301,13 +299,9 @@ async def get_favourite_training_for_user(
     logging.info("Getting trainings for user %s...", user_id)
     m.REQUEST_COUNTER.labels(USER_TRAININGS_URI, "get").inc()
     with session as open_session:
-        try:
-            logging.info("Searching for userId=%s...", user_id)
-            read_user(open_session, user_id)
-        except NoResultFound as error:
-            raise HTTPException(
-                detail="User not found.", status_code=404
-            ) from error
+        read_user(open_session, user_id)
+        # The following returns a Users database model with it's favourite
+        # trainings.
         user = browse_user_trainings(open_session, user_id, offset, limit)
     dtos = []
     logging.info("Building DTOs...")
