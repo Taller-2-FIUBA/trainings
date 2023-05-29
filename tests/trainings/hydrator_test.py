@@ -19,6 +19,7 @@ def test_when_hydrating_training_with_media_expect_read_call(
         "type.name": "D",
         "blocked": True,
         "exercises": [],
+        "ratings": [],
     })
     training_out = hydrate(training_stub, config_dummy)
     assert training_out.media == "blob"
@@ -49,6 +50,7 @@ def test_when_hydrating_training_without_media_expect_no_read_call(
         "type.name": "D",
         "blocked": True,
         "exercises": [],
+        "ratings": [],
     })
     training_out = hydrate(training_stub, config_dummy)
     assert training_out.media is None

@@ -1,7 +1,10 @@
 """DAO for trainings owned by a user."""
 from sqlalchemy.orm import Session
 
-from trainings.database.models import UserTraining, Users
+from trainings.database.models import (
+    UserTraining,
+    Users,
+)
 
 
 def browse(
