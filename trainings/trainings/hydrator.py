@@ -1,5 +1,6 @@
 """Hydrate DTOs from database objects."""
 import logging
+from statistics import mean
 from trainings.config import AppConfig
 from trainings.database.models import Training
 from trainings.firebase import read
@@ -12,6 +13,9 @@ def hydrate(training: Training, config: AppConfig) -> TrainingOut:
     media = None
     if training.media:
         media = read(str(training.media), config)
+    rating = 0
+    if training.ratings:
+        rating = mean(map(lambda rate: rate.rating, training.ratings))
     dto = TrainingOut(
         id=int(training.id),
         trainer_id=str(training.trainer_id),
@@ -21,7 +25,7 @@ def hydrate(training: Training, config: AppConfig) -> TrainingOut:
         type=str(training.type.name),
         media=media,
         blocked=bool(training.blocked),
-        rating=0,
+        rating=rating,
         exercises=[],
     )
     logging.info("Creating DTO for training exercises...")

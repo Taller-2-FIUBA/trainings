@@ -8,6 +8,7 @@ from trainings.database.data import (
 from trainings.database.models import (
     Training,
     TrainingExercise,
+    UserRatesTraining,
     UserTraining,
     Users
 )
@@ -157,6 +158,17 @@ def insert_user_trainings(session: Session):
     )
 
 
+def insert_user_ratings(session: Session):
+    """Insert ratings of a training by a user."""
+    _insert(
+        session,
+        [
+            UserRatesTraining(user_id=1, training_id=1, rating=4.5),
+            UserRatesTraining(user_id=2, training_id=1, rating=3.5),
+        ]
+    )
+
+
 def init_test_db(session: Session) -> None:
     """Create testing data."""
     with session as open_session:
@@ -167,3 +179,4 @@ def init_test_db(session: Session) -> None:
         insert_training_exercises(open_session)
         insert_users(open_session)
         insert_user_trainings(open_session)
+        insert_user_ratings(open_session)

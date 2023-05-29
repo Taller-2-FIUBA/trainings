@@ -5,12 +5,12 @@ from trainings.database.models import UserRatesTraining
 
 
 def add(
-    session: Session, user_id: str, training_id: int, ratting: float
+    session: Session, user_id: str, training_id: int, rating: float
 ) -> None:
     """Rate a training."""
     session.add(
         UserRatesTraining(
-            user_id=user_id, training_id=training_id, ratting=ratting
+            user_id=user_id, training_id=training_id, rating=rating
         )
     )
     session.commit()

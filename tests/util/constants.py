@@ -7,7 +7,7 @@ FIRST_TRAINING = {
     "description": "This is the first training.",
     "type": "Cardio",
     "difficulty": "Easy",
-    "rating": 0,
+    "rating": 4,
     "blocked": False,
     "exercises": [
         {

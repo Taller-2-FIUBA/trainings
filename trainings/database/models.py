@@ -73,6 +73,10 @@ class Training(Base):
     exercises: Mapped[List["TrainingExercise"]] = relationship(
         lazy="joined", back_populates="training"
     )
+    ratings: Mapped[List["UserRatesTraining"]] = relationship(
+        lazy="immediate",
+        back_populates="training",
+    )
 
 
 class Users(Base):
@@ -94,6 +98,9 @@ class Users(Base):
 
     # Relationships
     trainings: Mapped[List["UserTraining"]] = relationship(lazy="joined")
+    # rated_trainings: Mapped["UserRatesTraining"] = relationship(
+    #     lazy="joined", back_populates="user"
+    # )
 
 
 class UserTraining(Base):
@@ -124,4 +131,12 @@ class UserRatesTraining(Base):
     training_id: Mapped[int] = mapped_column(
         ForeignKey("training.id"), primary_key=True
     )
-    ratting = Column(Float)
+    rating = Column(Float)
+
+    # Relationships
+    # user: Mapped["Users"] = relationship(
+    #     lazy="joined", back_populates="rated_trainings"
+    # )
+    training: Mapped["Training"] = relationship(
+        lazy="joined", back_populates="ratings"
+    )
