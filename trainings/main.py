@@ -52,13 +52,18 @@ BASE_URI = "/trainings"
 TYPES_URI = BASE_URI + "/types/"
 EXERCISES_URI = BASE_URI + "/exercises/"
 USER_TRAININGS_URI = "/users/{user_id}/trainings"
+DOCUMENTATION_URI = BASE_URI + "/documentation/"
 TRAINING_ID = "/{training_id}"
+USER_TRAINING_URI = USER_TRAININGS_URI + TRAINING_ID
 CONFIGURATION = to_config(AppConfig)
 
 if CONFIGURATION.sentry.enabled:
     sentry_sdk.init(dsn=CONFIGURATION.sentry.dsn, traces_sample_rate=0.5)
 
-app = FastAPI(debug=CONFIGURATION.log_level.upper() == "DEBUG")
+app = FastAPI(
+    debug=CONFIGURATION.log_level.upper() == "DEBUG",
+    openapi_url=DOCUMENTATION_URI + "openapi.json"
+)
 METHODS = [
     "GET",
     "get",
@@ -267,7 +272,7 @@ async def save_training_for_user(
         add_user_training(open_session, user_id, training.training_id)
 
 
-@app.put(USER_TRAININGS_URI + TRAINING_ID, status_code=204)
+@app.put(USER_TRAINING_URI, status_code=204)
 async def rate_training(
     user_id: str,
     training_id: str,
@@ -278,7 +283,7 @@ async def rate_training(
     logging.info(
         "User %d rates training %d with %d", user_id, training_id, rating.rate
     )
-    m.REQUEST_COUNTER.labels(USER_TRAININGS_URI + TRAINING_ID, "put").inc()
+    m.REQUEST_COUNTER.labels(USER_TRAINING_URI, "put").inc()
     with session as open_session:
         read_user(open_session, user_id)
         read_training(open_session, training_id)
@@ -286,7 +291,7 @@ async def rate_training(
 
 
 @app.get(
-    USER_TRAININGS_URI + TRAINING_ID + "/rating",
+    USER_TRAINING_URI + "/rating",
     response_model=TrainingRating,
 )
 async def get_user_rate_for_training(
@@ -297,7 +302,7 @@ async def get_user_rate_for_training(
     """Get a training rating by a user."""
     logging.info("Getting training %d rate by user %d", user_id, training_id)
     m.REQUEST_COUNTER.labels(
-        USER_TRAININGS_URI + TRAINING_ID + "/rating", "get"
+        USER_TRAINING_URI + "/rating", "get"
     ).inc()
     with session as open_session:
         read_user(open_session, user_id)
@@ -337,7 +342,7 @@ async def get_favourite_training_for_user(
     )
 
 
-@app.get(BASE_URI + "/documentation/", include_in_schema=False)
+@app.get(DOCUMENTATION_URI, include_in_schema=False)
 async def custom_swagger_ui_html(req: Request):
     """To show Swagger with API documentation."""
     root_path = req.scope.get("root_path", "").rstrip("/")
