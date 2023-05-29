@@ -483,8 +483,12 @@ def test_when_getting_trainings_for_not_existing_user_expect_404():
 
 
 def test_when_ratting_training_for_a_user_expect_204():
-    response = client.put("/users/3/trainings/1", json={"rate": 3.5})
-    assert response.status_code == 204, response.json()
+    response_put = client.put("/users/3/trainings/1", json={"rate": 3.5})
+    assert response_put.status_code == 204, response_put.json()
+    # Validate
+    response_get = client.get("/users/3/trainings/1/rating")
+    assert response_get.status_code == 200, response_get.json()
+    assert response_get.json() == {"rate": 3.5}
 
 
 def test_when_ratting_training_for_not_existing_user_expect_404():
@@ -526,6 +530,23 @@ def test_when_getting_ratting_for_training_that_does_not_exist_expect_404():
 def test_when_getting_swagger_ui_expect_200():
     response = client.get(BASE_URI + "/documentation/")
     assert response.status_code == 200, response.json()
+
+
+def test_when_ratting_twice_expect_second_rating():
+    # Make first rating
+    response_first_put = client.put("/users/3/trainings/2", json={"rate": 1})
+    assert response_first_put.status_code == 204, response_first_put.json()
+    # Validate first rating
+    response_first_get = client.get("/users/3/trainings/2/rating")
+    assert response_first_get.status_code == 200, response_first_get.json()
+    assert response_first_get.json() == {"rate": 1}
+    # Make second rating
+    response_second_put = client.put("/users/3/trainings/2", json={"rate": 5})
+    assert response_second_put.status_code == 204, response_second_put.json()
+    # Validate second rating
+    response_second_get = client.get("/users/3/trainings/2/rating")
+    assert response_second_get.status_code == 200, response_second_get.json()
+    assert response_second_get.json() == {"rate": 5}
 
 
 HEADERS = {

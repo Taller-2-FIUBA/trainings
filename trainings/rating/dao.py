@@ -17,9 +17,16 @@ def add(
     session: Session, user_id: int, training_id: int, rating: float
 ) -> None:
     """Rate a training."""
-    session.add(
-        UserRatesTraining(
-            user_id=user_id, training_id=training_id, rating=rating
-        )
+    query = session.query(UserRatesTraining).where(
+        UserRatesTraining.user_id == user_id,
+        UserRatesTraining.training_id == training_id,
     )
+    if query.first():
+        query.update(values={"rating": rating})
+    else:
+        session.add(
+            UserRatesTraining(
+                user_id=user_id, training_id=training_id, rating=rating
+            )
+        )
     session.commit()
