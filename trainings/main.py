@@ -21,6 +21,7 @@ from trainings.database.data import init_db
 from trainings.request.helper import (
     read_training,
     read_user,
+    read_rating,
 )
 from trainings.trainings.dto import (
     TrainingIn,
@@ -44,7 +45,7 @@ from trainings.user_trainings.dao import (
     add as add_user_training,
     browse as browse_user_trainings
 )
-from trainings.rating.dto import TrainingRatingIn
+from trainings.rating.dto import TrainingRating
 from trainings.rating.dao import add as add_rating
 
 BASE_URI = "/trainings"
@@ -270,7 +271,7 @@ async def save_training_for_user(
 async def rate_training(
     user_id: str,
     training_id: str,
-    rating: TrainingRatingIn,
+    rating: TrainingRating,
     session: Session = Depends(get_db),
 ) -> None:
     """Rate a training."""
@@ -282,6 +283,27 @@ async def rate_training(
         read_user(open_session, user_id)
         read_training(open_session, training_id)
         add_rating(open_session, user_id, training_id, rating.rate)
+
+
+@app.get(
+    USER_TRAININGS_URI + TRAINING_ID + "/rating",
+    response_model=TrainingRating,
+)
+async def get_user_rate_for_training(
+    user_id: str,
+    training_id: str,
+    session: Session = Depends(get_db),
+) -> TrainingRating:
+    """Get a training rating by a user."""
+    logging.info("Getting training %d rate by user %d", user_id, training_id)
+    m.REQUEST_COUNTER.labels(
+        USER_TRAININGS_URI + TRAINING_ID + "/rating", "get"
+    ).inc()
+    with session as open_session:
+        read_user(open_session, user_id)
+        read_training(open_session, training_id)
+        rating = read_rating(open_session, user_id, training_id)
+    return TrainingRating(rate=rating.rating)
 
 
 @app.get(

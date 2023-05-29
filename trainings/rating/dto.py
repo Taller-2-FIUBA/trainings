@@ -3,7 +3,7 @@
 from pydantic import BaseModel
 
 
-class TrainingRatingIn(BaseModel):
+class TrainingRating(BaseModel):
     """Rating DTO."""
 
     rate: float

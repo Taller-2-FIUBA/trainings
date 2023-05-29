@@ -499,6 +499,30 @@ def test_when_ratting_training_that_does_not_exist_expect_404():
     assert response.json() == {"detail": "Training not found."}
 
 
+def test_when_getting_ratting_training_for_a_user_expect_rate():
+    response = client.get("/users/1/trainings/1/rating")
+    assert response.status_code == 200, response.json()
+    assert response.json() == {"rate": 4.5}
+
+
+def test_when_user_did_not_rate_training_expect_404():
+    response = client.get("/users/1/trainings/2/rating")
+    assert response.status_code == 404, response.json()
+    assert response.json() == {"detail": "Rating not found."}
+
+
+def test_when_getting_ratting_for_not_existing_user_expect_404():
+    response = client.get("/users/999/trainings/1/rating")
+    assert response.status_code == 404, response.json()
+    assert response.json() == {"detail": "User not found."}
+
+
+def test_when_getting_ratting_for_training_that_does_not_exist_expect_404():
+    response = client.get("/users/3/trainings/999/rating")
+    assert response.status_code == 404, response.json()
+    assert response.json() == {"detail": "Training not found."}
+
+
 def test_when_getting_swagger_ui_expect_200():
     response = client.get(BASE_URI + "/documentation/")
     assert response.status_code == 200, response.json()
