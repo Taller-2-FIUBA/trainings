@@ -58,7 +58,10 @@ CONFIGURATION = to_config(AppConfig)
 if CONFIGURATION.sentry.enabled:
     sentry_sdk.init(dsn=CONFIGURATION.sentry.dsn, traces_sample_rate=0.5)
 
-app = FastAPI(debug=CONFIGURATION.log_level.upper() == "DEBUG")
+app = FastAPI(
+    debug=CONFIGURATION.log_level.upper() == "DEBUG",
+    openapi_url='/trainings/documentation/openapi.json'
+)
 METHODS = [
     "GET",
     "get",
