@@ -4,4 +4,6 @@ from pydantic import BaseModel
 
 
 class HealthCheckDto(BaseModel):
+    """HeathCheck endpoint response model."""
+
     uptime: float

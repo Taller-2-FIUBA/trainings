@@ -347,6 +347,7 @@ async def get_favourite_training_for_user(
 
 @app.get(BASE_URI + "/healthcheck/")
 async def health_check() -> HealthCheckDto:
+    """Check for how long has the service been running."""
     return HealthCheckDto(uptime=time.time() - START)
 
 
