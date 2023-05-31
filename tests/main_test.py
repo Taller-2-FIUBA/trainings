@@ -1,6 +1,7 @@
 # pylint: disable= missing-module-docstring, missing-function-docstring
 from unittest.mock import ANY, MagicMock, patch
 from fastapi.testclient import TestClient
+from hamcrest import assert_that, greater_than
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
@@ -547,6 +548,12 @@ def test_when_ratting_twice_expect_second_rating():
     response_second_get = client.get("/users/3/trainings/2/rating")
     assert response_second_get.status_code == 200, response_second_get.json()
     assert response_second_get.json() == {"rate": 5}
+
+
+def test_when_checking_healthcheck_expect_uptime_greater_than_zero():
+    response = client.get("/trainings/healthcheck/")
+    assert response.status_code == 200, response.json()
+    assert_that(response.json()["uptime"], greater_than(0))
 
 
 HEADERS = {

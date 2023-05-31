@@ -1,4 +1,5 @@
 """Requests handlers."""
+import time
 import logging
 
 import sentry_sdk
@@ -23,6 +24,7 @@ from trainings.request.helper import (
     read_user,
     read_rating,
 )
+from trainings.healthcheck import HealthCheckDto
 from trainings.trainings.dto import (
     TrainingIn,
     TrainingOut,
@@ -56,6 +58,7 @@ DOCUMENTATION_URI = BASE_URI + "/documentation/"
 TRAINING_ID = "/{training_id}"
 USER_TRAINING_URI = USER_TRAININGS_URI + TRAINING_ID
 CONFIGURATION = to_config(AppConfig)
+START = time.time()
 
 if CONFIGURATION.sentry.enabled:
     sentry_sdk.init(dsn=CONFIGURATION.sentry.dsn, traces_sample_rate=0.5)
@@ -340,6 +343,11 @@ async def get_favourite_training_for_user(
         offset=offset,
         limit=limit,
     )
+
+
+@app.get(BASE_URI + "/healthcheck/")
+async def health_check() -> HealthCheckDto:
+    return HealthCheckDto(uptime=time.time() - START)
 
 
 @app.get(DOCUMENTATION_URI, include_in_schema=False)
