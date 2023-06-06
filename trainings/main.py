@@ -45,7 +45,8 @@ from trainings.firebase import save
 from trainings.user_trainings.dto import UserTrainingIn
 from trainings.user_trainings.dao import (
     add as add_user_training,
-    browse as browse_user_trainings
+    browse as browse_user_trainings,
+    delete as delete_user_training,
 )
 from trainings.rating.dto import TrainingRating
 from trainings.rating.dao import add as add_rating
@@ -273,6 +274,21 @@ async def save_training_for_user(
         read_training(open_session, training.training_id)
         read_user(open_session, user_id)
         add_user_training(open_session, user_id, training.training_id)
+
+
+@app.delete(USER_TRAINING_URI, status_code=204)
+async def delete_training_for_user(
+    user_id: str,
+    training_id: int,
+    session: Session = Depends(get_db),
+) -> None:
+    """Delete a training in user favourites."""
+    logging.info("Deleting training %d for user %s...", training_id, user_id)
+    m.REQUEST_COUNTER.labels(USER_TRAININGS_URI, "delete").inc()
+    with session as open_session:
+        read_training(open_session, training_id)
+        read_user(open_session, user_id)
+        delete_user_training(open_session, user_id, training_id)
 
 
 @app.put(USER_TRAINING_URI, status_code=204)

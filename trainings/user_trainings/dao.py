@@ -20,3 +20,12 @@ def add(session: Session, user_id: str, training_id: int) -> None:
     """Read a user from the database."""
     session.add(UserTraining(user_id=user_id, training_id=training_id))
     session.commit()
+
+
+def delete(session: Session, user_id: str, training_id: int) -> None:
+    """Delete a user from the database."""
+    session.query(UserTraining).where(
+        UserTraining.user_id == user_id,
+        UserTraining.training_id == training_id,
+    ).delete()
+    session.commit()
