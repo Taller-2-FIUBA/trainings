@@ -143,6 +143,20 @@ def insert_users(session: Session):
                 is_athlete=False,
                 is_blocked=False,
             ),
+            Users(
+                id="4",
+                email="UserThatDeleteFavouriteTrainings",
+                username="UserThatDeleteFavouriteTrainings",
+                name="UserThatDeleteFavouriteTrainings",
+                surname="UserThatDeleteFavouriteTrainings",
+                height=1.0,
+                weight=1,
+                birth_date="UserThatDeleteFavouriteTrainings",
+                location="UserThatDeleteFavouriteTrainings",
+                registration_date="UserThatDeleteFavouriteTrainings",
+                is_athlete=True,
+                is_blocked=False,
+            ),
         ]
     )
 
@@ -154,6 +168,7 @@ def insert_user_trainings(session: Session):
         [
             UserTraining(user_id=2, training_id=1),
             UserTraining(user_id=2, training_id=2),
+            UserTraining(user_id=4, training_id=1),
         ]
     )
 

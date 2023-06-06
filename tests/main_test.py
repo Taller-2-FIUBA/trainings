@@ -483,6 +483,38 @@ def test_when_getting_trainings_for_not_existing_user_expect_404():
     assert response.json() == {"detail": "User not found."}
 
 
+def test_when_deleting_favourite_training_1_for_user_4_expect_204():
+    # Validate user has one favourite training
+    response_first_get = client.get("/users/4/trainings")
+    assert response_first_get.status_code == 200, response_first_get.json()
+    assert are_equal(
+        response_first_get.json(),
+        c.EMPTY_RESPONSE_WITH_PAGINATION | {"items": [c.FIRST_TRAINING]},
+        {},
+    )
+    # Delete training
+    response_delete = client.delete("/users/4/trainings/1")
+    assert response_delete.status_code == 204, response_delete.json()
+    # Validate user has no favourite trainings
+    response_second_get = client.get("/users/4/trainings")
+    assert response_second_get.status_code == 200, response_second_get.json()
+    assert are_equal(
+        response_second_get.json(), c.EMPTY_RESPONSE_WITH_PAGINATION, {}
+    )
+
+
+def test_when_deleting_favourite_training_that_does_not_exist_expect_404():
+    response = client.delete("/users/4/trainings/999")
+    assert response.status_code == 404, response.json()
+    assert response.json() == {"detail": "Training not found."}
+
+
+def test_when_deleting_favourite_training_for_not_existing_user_expect_404():
+    response = client.delete("/users/999/trainings/1")
+    assert response.status_code == 404, response.json()
+    assert response.json() == {"detail": "User not found."}
+
+
 def test_when_ratting_training_for_a_user_expect_204():
     response_put = client.put("/users/3/trainings/1", json={"rate": 3.5})
     assert response_put.status_code == 204, response_put.json()
