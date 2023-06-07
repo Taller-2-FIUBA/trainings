@@ -23,7 +23,7 @@ def get_certificate(config: AppConfig) -> Dict[str, Any]:
         "type": config.firebase.type,
         "project_id": config.firebase.project_id,
         "private_key_id": config.firebase.private_key_id,
-        "private_key": config.firebase.private_key,
+        "private_key": config.firebase.private_key.replace(r'\n', '\n'),
         "client_email": config.firebase.client_email,
         "client_id": config.firebase.client_id,
         "auth_uri": config.firebase.auth_uri,
