@@ -2,7 +2,6 @@
 import time
 import logging
 
-import sentry_sdk
 from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.applications import get_swagger_ui_html
@@ -67,9 +66,6 @@ TRAINING_ID = "/{training_id}"
 USER_TRAINING_URI = USER_TRAININGS_URI + TRAINING_ID
 CONFIGURATION = to_config(AppConfig)
 START = time.time()
-
-if CONFIGURATION.sentry.enabled:
-    sentry_sdk.init(dsn=CONFIGURATION.sentry.dsn, traces_sample_rate=0.5)
 
 app = FastAPI(
     debug=CONFIGURATION.log_level.upper() == "DEBUG",

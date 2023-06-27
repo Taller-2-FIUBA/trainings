@@ -6,4 +6,4 @@ uvicorn
 sqlalchemy
 psycopg2-binary
 firebase_admin
-sentry-sdk[fastapi]
+newrelic
