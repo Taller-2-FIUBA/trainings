@@ -101,7 +101,7 @@ class Users(Base):
 
 
 class UserTraining(Base):
-    """Table structure for exercises within a training."""
+    """Table structure for users favourite trainings."""
 
     __tablename__ = "user_training"
     user_id: Mapped[int] = mapped_column(

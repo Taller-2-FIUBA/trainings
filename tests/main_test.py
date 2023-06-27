@@ -51,9 +51,10 @@ def test_get_all_trainings():
     ]
     response = client.get(BASE_URI)
     assert response.status_code == 200
+    values_to_override = {"items": expected_trainings, "count": 4}
     assert are_equal(
         response.json(),
-        c.EMPTY_RESPONSE_WITH_PAGINATION | {"items": expected_trainings},
+        c.EMPTY_RESPONSE_WITH_PAGINATION | values_to_override,
         {}
     )
 
@@ -66,12 +67,13 @@ def test_get_all_trainings_with_pagination():
     assert response.json()["limit"] == 30
 
 
-def test_when_filtering_by_trainer_id_tomate_returns_tomato_training():
+def test_when_filtering_by_trainer_id_tomato_returns_tomato_training():
     response = client.get(BASE_URI, params={"trainer_id": "tomato"})
     assert response.status_code == 200
+    values_to_override = {"items": [c.TOMATO_TRAINING], "count": 1}
     assert are_equal(
         response.json(),
-        c.EMPTY_RESPONSE_WITH_PAGINATION | {"items": [c.TOMATO_TRAINING]},
+        c.EMPTY_RESPONSE_WITH_PAGINATION | values_to_override,
         {},
     )
 
@@ -79,9 +81,10 @@ def test_when_filtering_by_trainer_id_tomate_returns_tomato_training():
 def test_when_filtering_by_type_cardio_returns_first_training():
     response = client.get(BASE_URI, params={"training_type": "Cardio"})
     assert response.status_code == 200
+    values_to_override = {"items": [c.FIRST_TRAINING], "count": 1}
     assert are_equal(
         response.json(),
-        c.EMPTY_RESPONSE_WITH_PAGINATION | {"items": [c.FIRST_TRAINING]},
+        c.EMPTY_RESPONSE_WITH_PAGINATION | values_to_override,
         {},
     )
 
@@ -97,9 +100,10 @@ def test_when_filtering_training_by_type_finger_expect_error():
 def test_when_filtering_by_difficulty_easy_returns_tomato_training():
     response = client.get(BASE_URI, params={"difficulty": "Medium"})
     assert response.status_code == 200
+    values_to_override = {"items": [c.TOMATO_TRAINING], "count": 1}
     assert are_equal(
         response.json(),
-        c.EMPTY_RESPONSE_WITH_PAGINATION | {"items": [c.TOMATO_TRAINING]},
+        c.EMPTY_RESPONSE_WITH_PAGINATION | values_to_override,
         {},
     )
 
@@ -126,6 +130,7 @@ def test_when_filtering_by_all_available_fields_expect_first_training():
         "items": [c.FIRST_TRAINING],
         "offset": 0,
         "limit": 1,
+        "count": 1,
     }
     assert are_equal(response.json(), expected_response, {})
 
@@ -139,9 +144,10 @@ def test_when_filtering_by_trainer_id_banana_returns_no_training():
 def test_when_filtering_by_title_the_tomato_returns_tomato_training():
     response = client.get(BASE_URI, params={"title": "The tomato"})
     assert response.status_code == 200
+    values_to_override = {"items": [c.TOMATO_TRAINING], "count": 1}
     assert are_equal(
         response.json(),
-        c.EMPTY_RESPONSE_WITH_PAGINATION | {"items": [c.TOMATO_TRAINING]},
+        c.EMPTY_RESPONSE_WITH_PAGINATION | values_to_override,
         {},
     )
 
@@ -443,18 +449,23 @@ def test_when_blocking_training_of_id_9999_expect_error():
     assert response.json() == {"detail": "Training not found."}
 
 
-def test_when_add_a_training_for_a_user_expect_204():
+def test_when_add_a_favourite_training_for_a_user_expect_204():
     response = client.post("/users/1/trainings", json={"training_id": 1})
     assert response.status_code == 204, response.json()
 
 
-def test_when_add_not_existing_training_for_a_user_expect_404():
+def test_when_trying_to_add_favourite_training_again_expect_409():
+    response = client.post("/users/2/trainings", json={"training_id": 1})
+    assert response.status_code == 409, response.json()
+
+
+def test_when_add_not_existing_favourite_training_for_a_user_expect_404():
     response = client.post("/users/1/trainings", json={"training_id": 999})
     assert response.status_code == 404, response.json()
     assert response.json() == {"detail": "Training not found."}
 
 
-def test_when_add_training_for_not_existing_user_expect_404():
+def test_when_add_favourite_training_for_not_existing_user_expect_404():
     response = client.post("/users/999/trainings", json={"training_id": 1})
     assert response.status_code == 404, response.json()
     assert response.json() == {"detail": "User not found."}
@@ -464,9 +475,10 @@ def test_when_getting_trainings_for_a_user_expect_first_and_tomato():
     response = client.get("/users/2/trainings")
     assert response.status_code == 200, response.json()
     expected_trainings = [c.FIRST_TRAINING, c.TOMATO_TRAINING]
+    values_to_override = {"items": expected_trainings, "count": 2}
     assert are_equal(
         response.json(),
-        c.EMPTY_RESPONSE_WITH_PAGINATION | {"items": expected_trainings},
+        c.EMPTY_RESPONSE_WITH_PAGINATION | values_to_override,
         {},
     )
 
@@ -487,9 +499,10 @@ def test_when_deleting_favourite_training_1_for_user_4_expect_204():
     # Validate user has one favourite training
     response_first_get = client.get("/users/4/trainings")
     assert response_first_get.status_code == 200, response_first_get.json()
+    values_to_override = {"items": [c.FIRST_TRAINING], "count": 1}
     assert are_equal(
         response_first_get.json(),
-        c.EMPTY_RESPONSE_WITH_PAGINATION | {"items": [c.FIRST_TRAINING]},
+        c.EMPTY_RESPONSE_WITH_PAGINATION | values_to_override,
         {},
     )
     # Delete training
@@ -562,6 +575,11 @@ def test_when_getting_ratting_for_training_that_does_not_exist_expect_404():
 
 def test_when_getting_swagger_ui_expect_200():
     response = client.get(BASE_URI + "/documentation/")
+    assert response.status_code == 200, response.json()
+
+
+def test_when_getting_openapi_doc_expect_200():
+    response = client.get(BASE_URI + "/documentation/openapi.json")
     assert response.status_code == 200, response.json()
 
 

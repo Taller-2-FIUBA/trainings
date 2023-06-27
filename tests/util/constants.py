@@ -94,6 +94,7 @@ EMPTY_RESPONSE_WITH_PAGINATION = {
     "items": [],
     "offset": 0,
     "limit": 10,
+    "count": 0,
 }
 
 

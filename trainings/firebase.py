@@ -36,7 +36,7 @@ def get_certificate(config: AppConfig) -> Dict[str, Any]:
 
 def initialize(config: AppConfig):
     """Configure firebase."""
-    logging.debug("Cheking if firebase is initialized...")
+    logging.debug("Checking if firebase is initialized...")
     try:
         app = get_app()
     except ValueError as e:

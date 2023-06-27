@@ -9,4 +9,13 @@ RUN pip install -e .
 
 WORKDIR /user/src/trainings
 
-ENTRYPOINT [ "uvicorn", "trainings.main:app", "--host", "0.0.0.0", "--port=8003", "--reload" ]
+ENTRYPOINT [\
+    "newrelic-admin",\
+    "run-program",\
+    "uvicorn",\
+    "trainings.main:app",\
+    "--host",\
+    "0.0.0.0",\
+    "--port=8003",\
+    "--reload"\
+]

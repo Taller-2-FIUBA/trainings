@@ -2,14 +2,14 @@
 import time
 import logging
 
-import sentry_sdk
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.applications import get_swagger_ui_html
 from environ import to_config
 from prometheus_client import start_http_server
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from httpx import Client
 
 import trainings.metrics as m
@@ -33,6 +33,9 @@ from trainings.trainings.dto import (
     TrainingFilters,
 )
 from trainings.trainings.dao import browse, add, edit
+from trainings.trainings.non_bread_queries import (
+    get_count as get_training_count
+)
 from trainings.trainings.helper import get_columns_and_values
 from trainings.trainings.hydrator import hydrate as hydrate_dto
 from trainings.training_types.dto import TrainingTypesOut
@@ -48,6 +51,9 @@ from trainings.user_trainings.dao import (
     browse as browse_user_trainings,
     delete as delete_user_training,
 )
+from trainings.user_trainings.non_bread_queries import (
+    get_count as get_favourite_trainings_count
+)
 from trainings.rating.dto import TrainingRating
 from trainings.rating.dao import add as add_rating
 
@@ -60,9 +66,6 @@ TRAINING_ID = "/{training_id}"
 USER_TRAINING_URI = USER_TRAININGS_URI + TRAINING_ID
 CONFIGURATION = to_config(AppConfig)
 START = time.time()
-
-if CONFIGURATION.sentry.enabled:
-    sentry_sdk.init(dsn=CONFIGURATION.sentry.dsn, traces_sample_rate=0.5)
 
 app = FastAPI(
     debug=CONFIGURATION.log_level.upper() == "DEBUG",
@@ -99,6 +102,7 @@ logging.basicConfig(encoding="utf-8", level=CONFIGURATION.log_level.upper())
 ENGINE = create_engine(
     get_database_url(CONFIGURATION),
     connect_args={"sslmode": "require" if CONFIGURATION.db.ssl else "disable"},
+    pool_pre_ping=True,
 )
 
 
@@ -140,6 +144,7 @@ async def get_trainings(
     logging.info("Searching for trainings matching (%s)...", filters.dict())
     with session as open_session:
         trainings = browse(open_session, filters)
+        count = get_training_count(open_session, filters)
     dtos = []
     logging.info("Building DTOs...")
     for training in trainings:
@@ -148,6 +153,7 @@ async def get_trainings(
         items=dtos,
         offset=filters.offset,
         limit=filters.limit,
+        count=count,
     )
     return response
 
@@ -161,7 +167,7 @@ async def get_trainings(
 async def get_training(
     training_id: int,
     session: Session = Depends(get_db)
-) -> TrainingsWithPagination:
+) -> TrainingOut:
     """Get one training."""
     m.REQUEST_COUNTER.labels(BASE_URI, "get").inc()
     with session as open_session:
@@ -267,13 +273,19 @@ async def save_training_for_user(
 ) -> None:
     """Save a training in user favourites."""
     logging.info(
-        "Saving training %d for user %s...", training.training_id, user_id
+        "Saving training %s for user %s...", training.training_id, user_id
     )
     m.REQUEST_COUNTER.labels(USER_TRAININGS_URI, "post").inc()
     with session as open_session:
         read_training(open_session, training.training_id)
         read_user(open_session, user_id)
-        add_user_training(open_session, user_id, training.training_id)
+        try:
+            add_user_training(open_session, user_id, training.training_id)
+        except IntegrityError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="You already have that training as favourite."
+            ) from exc
 
 
 @app.delete(USER_TRAINING_URI, status_code=204)
@@ -283,7 +295,7 @@ async def delete_training_for_user(
     session: Session = Depends(get_db),
 ) -> None:
     """Delete a training in user favourites."""
-    logging.info("Deleting training %d for user %s...", training_id, user_id)
+    logging.info("Deleting training %s for user %s...", training_id, user_id)
     m.REQUEST_COUNTER.labels(USER_TRAININGS_URI, "delete").inc()
     with session as open_session:
         read_training(open_session, training_id)
@@ -300,7 +312,7 @@ async def rate_training(
 ) -> None:
     """Rate a training."""
     logging.info(
-        "User %d rates training %d with %d", user_id, training_id, rating.rate
+        "User %s rates training %s with %s", user_id, training_id, rating.rate
     )
     m.REQUEST_COUNTER.labels(USER_TRAINING_URI, "put").inc()
     with session as open_session:
@@ -319,7 +331,7 @@ async def get_user_rate_for_training(
     session: Session = Depends(get_db),
 ) -> TrainingRating:
     """Get a training rating by a user."""
-    logging.info("Getting training %d rate by user %d", user_id, training_id)
+    logging.info("Getting training %s rate by user %s", user_id, training_id)
     m.REQUEST_COUNTER.labels(
         USER_TRAINING_URI + "/rating", "get"
     ).inc()
@@ -349,6 +361,7 @@ async def get_favourite_training_for_user(
         # The following returns a Users database model with it's favourite
         # trainings.
         user = browse_user_trainings(open_session, user_id, offset, limit)
+        count = get_favourite_trainings_count(open_session, user_id)
     dtos = []
     logging.info("Building DTOs...")
     for user_trainings in user.trainings:
@@ -358,6 +371,7 @@ async def get_favourite_training_for_user(
         items=dtos,
         offset=offset,
         limit=limit,
+        count=count,
     )
 
 

@@ -17,13 +17,13 @@ def browse(
 
 
 def add(session: Session, user_id: str, training_id: int) -> None:
-    """Read a user from the database."""
+    """Add favourite training for a user."""
     session.add(UserTraining(user_id=user_id, training_id=training_id))
     session.commit()
 
 
 def delete(session: Session, user_id: str, training_id: int) -> None:
-    """Delete a user from the database."""
+    """Delete favourite training for a user."""
     session.query(UserTraining).where(
         UserTraining.user_id == user_id,
         UserTraining.training_id == training_id,
