@@ -10,8 +10,8 @@ from environ import to_config
 from prometheus_client import start_http_server
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
-from httpx import Client
 from sqlalchemy.exc import IntegrityError
+from httpx import Client
 
 import trainings.metrics as m
 from trainings.authorization import assert_can_create_training, get_permissions
@@ -34,6 +34,9 @@ from trainings.trainings.dto import (
     TrainingFilters,
 )
 from trainings.trainings.dao import browse, add, edit
+from trainings.trainings.non_bread_queries import (
+    get_count as get_training_count
+)
 from trainings.trainings.helper import get_columns_and_values
 from trainings.trainings.hydrator import hydrate as hydrate_dto
 from trainings.training_types.dto import TrainingTypesOut
@@ -48,6 +51,9 @@ from trainings.user_trainings.dao import (
     add as add_user_training,
     browse as browse_user_trainings,
     delete as delete_user_training,
+)
+from trainings.user_trainings.non_bread_queries import (
+    get_count as get_favourite_trainings_count
 )
 from trainings.rating.dto import TrainingRating
 from trainings.rating.dao import add as add_rating
@@ -142,6 +148,7 @@ async def get_trainings(
     logging.info("Searching for trainings matching (%s)...", filters.dict())
     with session as open_session:
         trainings = browse(open_session, filters)
+        count = get_training_count(open_session, filters)
     dtos = []
     logging.info("Building DTOs...")
     for training in trainings:
@@ -150,6 +157,7 @@ async def get_trainings(
         items=dtos,
         offset=filters.offset,
         limit=filters.limit,
+        count=count,
     )
     return response
 
@@ -163,7 +171,7 @@ async def get_trainings(
 async def get_training(
     training_id: int,
     session: Session = Depends(get_db)
-) -> TrainingsWithPagination:
+) -> TrainingOut:
     """Get one training."""
     m.REQUEST_COUNTER.labels(BASE_URI, "get").inc()
     with session as open_session:
@@ -357,6 +365,7 @@ async def get_favourite_training_for_user(
         # The following returns a Users database model with it's favourite
         # trainings.
         user = browse_user_trainings(open_session, user_id, offset, limit)
+        count = get_favourite_trainings_count(open_session, user_id)
     dtos = []
     logging.info("Building DTOs...")
     for user_trainings in user.trainings:
@@ -366,6 +375,7 @@ async def get_favourite_training_for_user(
         items=dtos,
         offset=offset,
         limit=limit,
+        count=count,
     )
 
 
