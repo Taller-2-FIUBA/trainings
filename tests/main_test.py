@@ -565,6 +565,11 @@ def test_when_getting_swagger_ui_expect_200():
     assert response.status_code == 200, response.json()
 
 
+def test_when_getting_openapi_doc_expect_200():
+    response = client.get(BASE_URI + "/documentation/openapi.json")
+    assert response.status_code == 200, response.json()
+
+
 def test_when_ratting_twice_expect_second_rating():
     # Make first rating
     response_first_put = client.put("/users/3/trainings/2", json={"rate": 1})
