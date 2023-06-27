@@ -99,6 +99,7 @@ logging.basicConfig(encoding="utf-8", level=CONFIGURATION.log_level.upper())
 ENGINE = create_engine(
     get_database_url(CONFIGURATION),
     connect_args={"sslmode": "require" if CONFIGURATION.db.ssl else "disable"},
+    pool_pre_ping=True,
 )
 
 
