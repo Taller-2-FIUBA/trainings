@@ -267,7 +267,7 @@ async def save_training_for_user(
 ) -> None:
     """Save a training in user favourites."""
     logging.info(
-        "Saving training %d for user %s...", training.training_id, user_id
+        "Saving training %s for user %s...", training.training_id, user_id
     )
     m.REQUEST_COUNTER.labels(USER_TRAININGS_URI, "post").inc()
     with session as open_session:
@@ -283,7 +283,7 @@ async def delete_training_for_user(
     session: Session = Depends(get_db),
 ) -> None:
     """Delete a training in user favourites."""
-    logging.info("Deleting training %d for user %s...", training_id, user_id)
+    logging.info("Deleting training %s for user %s...", training_id, user_id)
     m.REQUEST_COUNTER.labels(USER_TRAININGS_URI, "delete").inc()
     with session as open_session:
         read_training(open_session, training_id)
@@ -300,7 +300,7 @@ async def rate_training(
 ) -> None:
     """Rate a training."""
     logging.info(
-        "User %d rates training %d with %d", user_id, training_id, rating.rate
+        "User %s rates training %s with %s", user_id, training_id, rating.rate
     )
     m.REQUEST_COUNTER.labels(USER_TRAINING_URI, "put").inc()
     with session as open_session:
@@ -319,7 +319,7 @@ async def get_user_rate_for_training(
     session: Session = Depends(get_db),
 ) -> TrainingRating:
     """Get a training rating by a user."""
-    logging.info("Getting training %d rate by user %d", user_id, training_id)
+    logging.info("Getting training %s rate by user %s", user_id, training_id)
     m.REQUEST_COUNTER.labels(
         USER_TRAINING_URI + "/rating", "get"
     ).inc()
