@@ -443,18 +443,23 @@ def test_when_blocking_training_of_id_9999_expect_error():
     assert response.json() == {"detail": "Training not found."}
 
 
-def test_when_add_a_training_for_a_user_expect_204():
+def test_when_add_a_favourite_training_for_a_user_expect_204():
     response = client.post("/users/1/trainings", json={"training_id": 1})
     assert response.status_code == 204, response.json()
 
 
-def test_when_add_not_existing_training_for_a_user_expect_404():
+def test_when_trying_to_add_favourite_training_again_expect_409():
+    response = client.post("/users/2/trainings", json={"training_id": 1})
+    assert response.status_code == 409, response.json()
+
+
+def test_when_add_not_existing_favourite_training_for_a_user_expect_404():
     response = client.post("/users/1/trainings", json={"training_id": 999})
     assert response.status_code == 404, response.json()
     assert response.json() == {"detail": "Training not found."}
 
 
-def test_when_add_training_for_not_existing_user_expect_404():
+def test_when_add_favourite_training_for_not_existing_user_expect_404():
     response = client.post("/users/999/trainings", json={"training_id": 1})
     assert response.status_code == 404, response.json()
     assert response.json() == {"detail": "User not found."}

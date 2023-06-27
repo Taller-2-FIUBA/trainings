@@ -3,7 +3,7 @@ import time
 import logging
 
 import sentry_sdk
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.applications import get_swagger_ui_html
 from environ import to_config
@@ -11,6 +11,7 @@ from prometheus_client import start_http_server
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from httpx import Client
+from sqlalchemy.exc import IntegrityError
 
 import trainings.metrics as m
 from trainings.authorization import assert_can_create_training, get_permissions
@@ -274,7 +275,13 @@ async def save_training_for_user(
     with session as open_session:
         read_training(open_session, training.training_id)
         read_user(open_session, user_id)
-        add_user_training(open_session, user_id, training.training_id)
+        try:
+            add_user_training(open_session, user_id, training.training_id)
+        except IntegrityError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="You already have that training as favourite."
+            ) from exc
 
 
 @app.delete(USER_TRAINING_URI, status_code=204)
