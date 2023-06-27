@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: trainings
-        image: marianocinalli/trainings:v0.0.16
+        image: marianocinalli/trainings:v0.0.17
         imagePullPolicy: Always
         envFrom:
         - configMapRef:
