@@ -6,13 +6,15 @@ from fastapi import Depends, FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.applications import get_swagger_ui_html
 from environ import to_config
-from prometheus_client import start_http_server
+from newrelic.agent import (
+    record_custom_metric as record_metric,
+    register_application,
+)
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from httpx import Client
 
-import trainings.metrics as m
 from trainings.authorization import assert_can_create_training, get_permissions
 from trainings.config import AppConfig
 from trainings.database.url import get_database_url
@@ -66,6 +68,8 @@ TRAINING_ID = "/{training_id}"
 USER_TRAINING_URI = USER_TRAININGS_URI + TRAINING_ID
 CONFIGURATION = to_config(AppConfig)
 START = time.time()
+NR_APP = register_application()
+COUNTER = {"count": 1}
 
 app = FastAPI(
     debug=CONFIGURATION.log_level.upper() == "DEBUG",
@@ -96,7 +100,6 @@ app.add_middleware(
     allow_headers=['*']
 )
 
-start_http_server(CONFIGURATION.prometheus_port)
 logging.basicConfig(encoding="utf-8", level=CONFIGURATION.log_level.upper())
 
 ENGINE = create_engine(
@@ -132,7 +135,7 @@ async def get_trainings(
     session: Session = Depends(get_db)
 ) -> TrainingsWithPagination:
     """Get trainings matching a filtering criteria."""
-    m.REQUEST_COUNTER.labels(BASE_URI, "get").inc()
+    record_metric('Custom/trainings/get', COUNTER, NR_APP)
     filters = TrainingFilters(
         trainer_id=trainer_id,
         type=training_type,
@@ -169,7 +172,7 @@ async def get_training(
     session: Session = Depends(get_db)
 ) -> TrainingOut:
     """Get one training."""
-    m.REQUEST_COUNTER.labels(BASE_URI, "get").inc()
+    record_metric('Custom/trainings-id/get', COUNTER, NR_APP)
     with session as open_session:
         training = read_training(open_session, training_id)
     logging.info("Building DTO...")
@@ -186,7 +189,7 @@ async def modify_training(
     session: Session = Depends(get_db),
 ):
     """Modify one training."""
-    m.REQUEST_COUNTER.labels(BASE_URI, "patch").inc()
+    record_metric('Custom/trainings-id/patch', COUNTER, NR_APP)
     logging.info("Received values (%s) to update.", body.dict())
     with session as open_session:
         logging.info("Searching for training...")
@@ -229,7 +232,7 @@ async def create_training(
             CONFIGURATION
         )
     logging.info("Creating training %s", training_to_create.dict())
-    m.REQUEST_COUNTER.labels(BASE_URI, "post").inc()
+    record_metric('Custom/trainings/post', COUNTER, NR_APP)
     with session as open_session:
         created_training = add(
             open_session, hydrate_model(open_session, training_to_create)
@@ -240,7 +243,7 @@ async def create_training(
 @app.get(TYPES_URI, response_model=TrainingTypesOut)
 async def get_types(session: Session = Depends(get_db)) -> TrainingTypesOut:
     """Get training types."""
-    m.REQUEST_COUNTER.labels(TYPES_URI, "get").inc()
+    record_metric('Custom/trainings-types/get', COUNTER, NR_APP)
     logging.info("Searching for training types...")
     training_types = []
     with session as open_session:
@@ -256,7 +259,7 @@ async def get_types(session: Session = Depends(get_db)) -> TrainingTypesOut:
 )
 async def get_exercises(session: Session = Depends(get_db)) -> ExercisesOut:
     """Get training exercises."""
-    m.REQUEST_COUNTER.labels(EXERCISES_URI, "get").inc()
+    record_metric('Custom/trainings-exercises/get', COUNTER, NR_APP)
     logging.info("Searching for exercises...")
     exercises = []
     with session as open_session:
@@ -275,7 +278,7 @@ async def save_training_for_user(
     logging.info(
         "Saving training %s for user %s...", training.training_id, user_id
     )
-    m.REQUEST_COUNTER.labels(USER_TRAININGS_URI, "post").inc()
+    record_metric('Custom/users-id-trainings/post', COUNTER, NR_APP)
     with session as open_session:
         read_training(open_session, training.training_id)
         read_user(open_session, user_id)
@@ -296,7 +299,7 @@ async def delete_training_for_user(
 ) -> None:
     """Delete a training in user favourites."""
     logging.info("Deleting training %s for user %s...", training_id, user_id)
-    m.REQUEST_COUNTER.labels(USER_TRAININGS_URI, "delete").inc()
+    record_metric('Custom/users-id-trainings-id/delete', COUNTER, NR_APP)
     with session as open_session:
         read_training(open_session, training_id)
         read_user(open_session, user_id)
@@ -314,7 +317,7 @@ async def rate_training(
     logging.info(
         "User %s rates training %s with %s", user_id, training_id, rating.rate
     )
-    m.REQUEST_COUNTER.labels(USER_TRAINING_URI, "put").inc()
+    record_metric('Custom/users-id-trainings-id/put', COUNTER, NR_APP)
     with session as open_session:
         read_user(open_session, user_id)
         read_training(open_session, training_id)
@@ -332,9 +335,7 @@ async def get_user_rate_for_training(
 ) -> TrainingRating:
     """Get a training rating by a user."""
     logging.info("Getting training %s rate by user %s", user_id, training_id)
-    m.REQUEST_COUNTER.labels(
-        USER_TRAINING_URI + "/rating", "get"
-    ).inc()
+    record_metric('Custom/users-id-trainings-id-rating/get', COUNTER, NR_APP)
     with session as open_session:
         read_user(open_session, user_id)
         read_training(open_session, training_id)
@@ -355,7 +356,7 @@ async def get_favourite_training_for_user(
 ) -> TrainingsWithPagination:
     """Return a user favourite trainings."""
     logging.info("Getting trainings for user %s...", user_id)
-    m.REQUEST_COUNTER.labels(USER_TRAININGS_URI, "get").inc()
+    record_metric('Custom/users-id-trainings/get', COUNTER, NR_APP)
     with session as open_session:
         read_user(open_session, user_id)
         # The following returns a Users database model with it's favourite

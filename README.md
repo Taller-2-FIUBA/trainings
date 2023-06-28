@@ -33,18 +33,20 @@ tox
 Building docker image:
 
 ```bash
-docker build --tag IMAGE_NAME .
+docker build . --tag fiufit/trainings:latest
 ```
-
-Where `IMAGE_NAME` is a name to identify the image later.
 
 Then run the container:
 
 ```bash
-docker run --rm -p 8080:80 --name CONTAINER_NAME IMAGE_NAME
+docker run --rm -p 8080:80 --name CONTAINER_NAME fiufit/trainings:latest
 ```
 
-Where `IMAGE_NAME` is the name chosen in the previous step and `CONTAINER_NAME`
-is a name to identify the container running.
 Notice `--rm` tells docker to remove the container after exists, and
 `-p 8080:80` maps the port 80 in the container to the port 8080 in the host.
+
+## Using the image in a local K8s cluster (k3d)
+
+```bash
+k3d image import fiufit/trainings:latest --cluster=taller2
+```

@@ -24,7 +24,7 @@ def get_permissions(
     credentials = http_client.get(url, headers={"Authorization": auth_header})
     if credentials.status_code != status.HTTP_200_OK:
         logging.error(
-            "Error getting token. Status code: %d, Error: %s",
+            "Error getting token. Status code: %s, Error: %s",
             credentials.status_code,
             credentials.json()
         )
