@@ -1,6 +1,5 @@
 fastapi[all]
 pydantic
-prometheus-client
 environ-config
 uvicorn
 sqlalchemy

@@ -14,7 +14,7 @@ from trainings.rating.dao import read as rating_dao_read
 def read_user(open_session: Session, user_id: int) -> Users:
     """Get user or throw HTTP 404 error."""
     try:
-        logging.info("Searching for userId %d...", user_id)
+        logging.info("Searching for userId %s...", user_id)
         return user_dao_read(open_session, user_id)
     except NoResultFound as error:
         raise HTTPException(
@@ -25,7 +25,7 @@ def read_user(open_session: Session, user_id: int) -> Users:
 def read_training(open_session: Session, training_id: int) -> Training:
     """Get training or throw HTTP 404 error."""
     try:
-        logging.info("Searching for trainingId %d...", training_id)
+        logging.info("Searching for trainingId %s...", training_id)
         return trainings_dao_read(open_session, training_id)
     except NoResultFound as error:
         raise HTTPException(
